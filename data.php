@@ -17,11 +17,11 @@ define('API_KEY', 'ucv-wsn-secret-2025');
 // ── DB CONFIG ──────────────────────────────────────────────
 // Reads from Railway environment variables automatically.
 // Falls back to localhost for local testing.
-$host = getenv('MYSQLHOST')     ?: 'localhost';
-$user = getenv('MYSQLUSER')     ?: 'root';
-$pass = getenv('MYSQLPASSWORD') ?: '';
-$db   = getenv('MYSQLDATABASE') ?: 'wsn_weather';
-$port = intval(getenv('MYSQLPORT') ?: 3306);
+$host = getenv('MYSQLHOST')          ?: 'localhost';
+$user = getenv('MYSQLUSER')          ?: 'root';
+$pass = getenv('MYSQL_ROOT_PASSWORD') ?: '';
+$db   = getenv('MYSQL_DATABASE')     ?: 'wsn_weather';
+$port = intval(getenv('MYSQLPORT')   ?: 3306);
 
 $conn = new mysqli($host, $user, $pass, $db, $port);
 if ($conn->connect_error) {
