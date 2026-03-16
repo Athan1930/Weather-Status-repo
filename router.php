@@ -1,19 +1,22 @@
 <?php
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$file = __DIR__ . $uri;
 
-// If the file exists, serve it directly
-if ($uri !== '/' && file_exists($file)) {
-    return false;
+// Route /data.php
+if ($uri === '/data.php') {
+    require __DIR__ . '/data.php';
+    exit;
 }
 
 // Route /api/data.php
-if (strpos($uri, '/api/') === 0) {
-    $phpFile = __DIR__ . $uri;
-    if (file_exists($phpFile)) {
-        require $phpFile;
-        exit;
-    }
+if ($uri === '/api/data.php') {
+    require __DIR__ . '/api/data.php';
+    exit;
+}
+
+// Serve static files directly
+$file = __DIR__ . $uri;
+if ($uri !== '/' && file_exists($file) && !is_dir($file)) {
+    return false;
 }
 
 // Default — serve index.html
