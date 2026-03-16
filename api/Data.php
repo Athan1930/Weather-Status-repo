@@ -12,15 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // ── API KEY PROTECTION ─────────────────────────────────────
 // Change this to any secret string. Must match your Arduino code.
-define('API_KEY', 'ucv-wsn-secret-2025');
+define('API_KEY', 'uc-vwsn-secret-2025');
 
 // ── DB CONFIG ──────────────────────────────────────────────
 // Reads from Railway environment variables automatically.
 // Falls back to localhost for local testing.
-$host = getenv('MYSQLHOST')     ?: 'localhost';
-$user = getenv('MYSQLUSER')     ?: 'root';
+$host = getenv('MYSQLHOST') ?: 'localhost';
+$user = getenv('MYSQLUSER') ?: 'root';
 $pass = getenv('MYSQLPASSWORD') ?: '';
-$db   = getenv('MYSQLDATABASE') ?: 'wsn_weather';
+$db = getenv('MYSQLDATABASE') ?: 'wsn_weather';
 $port = intval(getenv('MYSQLPORT') ?: 3306);
 
 $conn = new mysqli($host, $user, $pass, $db, $port);
@@ -49,7 +49,8 @@ $conn->query("
 ");
 
 // ── HELPER: Send JSON error and exit ──────────────────────
-function jsonError(int $code, string $message): void {
+function jsonError(int $code, string $message): void
+{
     http_response_code($code);
     echo json_encode(["error" => $message]);
     exit;
@@ -73,20 +74,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // ── Sanitize & validate inputs ─────────────────────────
-    $node_id  = substr($conn->real_escape_string($body['node_id']  ?? 'NODE-01'), 0, 20);
-    $location = substr($conn->real_escape_string($body['location'] ?? ''),        0, 100);
-    $temp     = floatval($body['temperature'] ?? 0);
-    $hum      = floatval($body['humidity']    ?? 0);
-    $wind     = floatval($body['wind_speed']  ?? 0);
-    $rain     = floatval($body['rain']        ?? 0);
-    $total    = floatval($body['total_rain']  ?? 0);
+    $node_id = substr($conn->real_escape_string($body['node_id'] ?? 'NODE-01'), 0, 20);
+    $location = substr($conn->real_escape_string($body['location'] ?? ''), 0, 100);
+    $temp = floatval($body['temperature'] ?? 0);
+    $hum = floatval($body['humidity'] ?? 0);
+    $wind = floatval($body['wind_speed'] ?? 0);
+    $rain = floatval($body['rain'] ?? 0);
+    $total = floatval($body['total_rain'] ?? 0);
 
     // Sanity-check sensor ranges (reject physically impossible values)
-    if ($temp  < -40  || $temp  > 85)  $temp  = 0.0;
-    if ($hum   < 0    || $hum   > 100) $hum   = 0.0;
-    if ($wind  < 0    || $wind  > 400) $wind  = 0.0;
-    if ($rain  < 0    || $rain  > 500) $rain  = 0.0;
-    if ($total < 0)                    $total = 0.0;
+    if ($temp < -40 || $temp > 85)
+        $temp = 0.0;
+    if ($hum < 0 || $hum > 100)
+        $hum = 0.0;
+    if ($wind < 0 || $wind > 400)
+        $wind = 0.0;
+    if ($rain < 0 || $rain > 500)
+        $rain = 0.0;
+    if ($total < 0)
+        $total = 0.0;
 
     // ── Insert into DB ─────────────────────────────────────
     $stmt = $conn->prepare("
@@ -97,14 +103,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt->execute()) {
         echo json_encode([
-            "status"      => "ok",
-            "id"          => $stmt->insert_id,
-            "node_id"     => $node_id,
+            "status" => "ok",
+            "id" => $stmt->insert_id,
+            "node_id" => $node_id,
             "temperature" => $temp,
-            "humidity"    => $hum,
-            "wind_speed"  => $wind,
-            "rain"        => $rain,
-            "total_rain"  => $total
+            "humidity" => $hum,
+            "wind_speed" => $wind,
+            "rain" => $rain,
+            "total_rain" => $total
         ]);
     } else {
         jsonError(500, "Insert failed: " . $stmt->error);
@@ -112,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt->close();
 
-// ══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
 //  GET — Dashboard fetches data
 // ══════════════════════════════════════════════════════════
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -122,13 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ── Whitelist range param ──────────────────────────────
     $rangeMap = [
-        'live'  => 'AND recorded_at >= NOW() - INTERVAL 2 HOUR',
+        'live' => 'AND recorded_at >= NOW() - INTERVAL 2 HOUR',
         'today' => 'AND DATE(recorded_at) = CURDATE()',
         '3days' => 'AND recorded_at >= NOW() - INTERVAL 3 DAY',
-        'week'  => 'AND recorded_at >= NOW() - INTERVAL 7 DAY',
+        'week' => 'AND recorded_at >= NOW() - INTERVAL 7 DAY',
         'month' => 'AND recorded_at >= NOW() - INTERVAL 30 DAY',
     ];
-    $range       = $_GET['range'] ?? 'live';
+    $range = $_GET['range'] ?? 'live';
     $whereClause = $rangeMap[$range] ?? $rangeMap['live'];
 
     // ── rows=1: return only the latest single reading ──────
@@ -144,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $row = $result->fetch_assoc();
         echo json_encode($row ?: new stdClass());
 
-    // ── rows>1: return historical data for charts/table ────
+        // ── rows>1: return historical data for charts/table ────
     } else {
         $stmt = $conn->prepare("
             SELECT * FROM sensor_data
