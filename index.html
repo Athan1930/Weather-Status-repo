@@ -66,8 +66,63 @@
     #conn-dot.online  { background: var(--green); box-shadow: 0 0 8px var(--green); }
     #conn-dot.offline { background: var(--red);   box-shadow: 0 0 8px var(--red); }
     #last-update { color: rgba(255,255,255,0.3); font-family: 'Space Mono', monospace; font-size: 0.68rem; }
+
+    /* ── RETRY BANNER ── */
+    #retry-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.06));
+      border: 1px solid var(--red);
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: #ff9999;
+    }
+    #retry-banner .retry-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #retry-banner .retry-detail {
+      color: rgba(255,150,150,0.7);
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+    }
+    #retry-countdown { color: var(--red); font-weight: 700; }
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,77,109,0.3);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .retry-progress {
+      height: 4px;
+      background: rgba(255,77,109,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .retry-progress-bar {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+      transition: width 1s linear;
+      width: 100%;
+    }
+
+    /* ── ALERT ── */
     #alert-banner { display: none; background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.06)); border: 1px solid var(--red); border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; font-size: 0.95rem; font-weight: 600; color: #ff9999; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+
     .time-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; align-items:center; }
     .time-tabs label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-right:4px; }
     .tab-btn { font-family: 'Space Mono', monospace; font-size:0.78rem; padding:7px 18px; border-radius:6px; border:1px solid var(--border2); background:var(--card); color:var(--muted); cursor:pointer; transition:all 0.2s; }
@@ -161,6 +216,18 @@
   </div>
 </header>
 
+<!-- RETRY BANNER -->
+<div id="retry-banner">
+  <div class="retry-title">
+    <span class="spinner"></span>
+    <span id="retry-title-text">⚠️ Connection Lost — Reconnecting...</span>
+  </div>
+  <div class="retry-detail" id="retry-detail-text">Unable to reach sensor node</div>
+  <div>Retrying in <span id="retry-countdown">3</span>s &nbsp;|&nbsp; Attempt <span id="retry-attempt">1</span> of <span id="retry-max">5</span></div>
+  <div class="retry-progress"><div class="retry-progress-bar" id="retry-bar"></div></div>
+</div>
+
+<!-- ALERT BANNER -->
 <div id="alert-banner">⚠️ <span id="alert-text"></span></div>
 
 <div class="section-label">📟 Live Readings</div>
@@ -376,21 +443,30 @@ document.getElementById('ucv-logo').onerror = function() {
   this.src = 'https://www.ucv.edu.ph/assets/images/ucv-seal.png';
 };
 
-// !! IMPORTANT: Replace with your actual Railway URL after deployment !!
-const API_URL    = 'http://192.168.1.15/api/sensors';
-const REFRESH_MS = 5000;
+// ─────────────────────────────────────────────
+//  !! IMPORTANT: Set this to your ESP32's IP !!
+//  Check Serial Monitor after uploading Arduino
+//  code — it shows: http://192.168.x.x/api/sensors
+// ─────────────────────────────────────────────
+const API_URL     = 'http://192.168.1.9/api/sensors';
+const REFRESH_MS  = 3000;   // fetch every 3 seconds
+const MAX_RETRIES = 5;      // max reconnect attempts before giving up
 const THRESH_WIND = 25;
 const THRESH_TEMP = 38;
 const THRESH_RAIN = 0;
 
-let currentRange = 'live';
-let allData      = [];
-let sortKey      = 'time';
-let sortAsc      = false;
-let currentPage  = 1;
-const PAGE_SIZE  = 10;
-let searchQuery  = '';
+// ── State ──────────────────────────────────────
+let retryCount        = 0;
+let countdownInterval = null;
+let currentRange      = 'live';
+let allData           = [];
+let sortKey           = 'time';
+let sortAsc           = false;
+let currentPage       = 1;
+const PAGE_SIZE       = 10;
+let searchQuery       = '';
 
+// ── Charts ─────────────────────────────────────
 const chartCfg = (color, fill) => ({
   type: 'line',
   options: {
@@ -426,11 +502,15 @@ const rainChart = new Chart(document.getElementById('chart-rain'), {
 });
 
 function updateCharts(data) {
-  const labels = data.map(d => new Date(d.recorded_at + ' UTC').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-  const temps  = data.map(d => parseFloat(d.temperature));
-  const hums   = data.map(d => parseFloat(d.humidity));
-  const winds  = data.map(d => parseFloat(d.wind_speed));
-  const rains  = data.map(d => parseFloat(d.rain));
+  const now    = Date.now();
+  const labels = data.map((d, i) => {
+    if (d.recorded_at) return new Date(d.recorded_at + ' UTC').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(now - (data.length - i) * REFRESH_MS).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  });
+  const temps = data.map(d => parseFloat(d.temperature));
+  const hums  = data.map(d => parseFloat(d.humidity));
+  const winds = data.map(d => parseFloat(d.wind_speed));
+  const rains = data.map(d => parseFloat(d.rain));
   [[tempChart, temps], [humChart, hums], [windChart, winds]].forEach(([c, d]) => {
     c.data.labels = labels; c.data.datasets[0].data = d; c.update();
   });
@@ -508,7 +588,7 @@ function updateCards(d) {
   document.getElementById('val-wind').textContent      = wind.toFixed(1);
   document.getElementById('val-rain').textContent      = isRaining ? '🌧 ' + rain.toFixed(2) : '☀️ 0.00';
   document.getElementById('val-totalrain').textContent = totalRain.toFixed(2);
-  document.getElementById('last-update').textContent   = 'Updated: ' + new Date(d.recorded_at + ' UTC').toLocaleTimeString();
+  document.getElementById('last-update').textContent   = 'Updated: ' + new Date().toLocaleTimeString();
   setCardWarning('card-temp',      'status-temp',      temp > THRESH_TEMP, 'High Temp!');
   setCardWarning('card-wind',      'status-wind',      wind > THRESH_WIND, 'Strong Wind!');
   setCardWarning('card-rain',      'status-rain',      isRaining,          'Rain Detected!');
@@ -526,11 +606,12 @@ function updateCards(d) {
   updateWindLadder(wind);
 }
 
+// ── TABLE ──────────────────────────────────────
 function renderTable() {
   let rows = [...allData];
   if (searchQuery) {
     rows = rows.filter(d =>
-      d.recorded_at.includes(searchQuery) ||
+      (d.recorded_at || '').includes(searchQuery) ||
       d.temperature.toString().includes(searchQuery) ||
       d.humidity.toString().includes(searchQuery) ||
       d.wind_speed.toString().includes(searchQuery) ||
@@ -539,7 +620,7 @@ function renderTable() {
   }
   rows.sort((a, b) => {
     let va, vb;
-    if (sortKey === 'time') { va = new Date(a.recorded_at); vb = new Date(b.recorded_at); }
+    if (sortKey === 'time') { va = new Date(a.recorded_at || 0); vb = new Date(b.recorded_at || 0); }
     if (sortKey === 'temp') { va = parseFloat(a.temperature); vb = parseFloat(b.temperature); }
     if (sortKey === 'hum')  { va = parseFloat(a.humidity);    vb = parseFloat(b.humidity); }
     if (sortKey === 'wind') { va = parseFloat(a.wind_speed);  vb = parseFloat(b.wind_speed); }
@@ -552,7 +633,7 @@ function renderTable() {
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
   slice.forEach((d, i) => {
-    const dt        = new Date(d.recorded_at + ' UTC');
+    const ts        = d.recorded_at ? new Date(d.recorded_at + ' UTC').toLocaleString() : new Date().toLocaleTimeString();
     const temp      = parseFloat(d.temperature);
     const hum       = parseFloat(d.humidity);
     const wind      = parseFloat(d.wind_speed);
@@ -564,7 +645,7 @@ function renderTable() {
     tbody.innerHTML += `
       <tr>
         <td class="td-time">${(currentPage-1)*PAGE_SIZE+i+1}</td>
-        <td class="td-time">${dt.toLocaleString()}</td>
+        <td class="td-time">${ts}</td>
         <td class="td-temp">${temp.toFixed(1)}</td>
         <td class="td-hum">${hum.toFixed(0)}</td>
         <td class="td-wind">${wind.toFixed(1)}</td>
@@ -607,72 +688,113 @@ document.getElementById('table-search').addEventListener('input', function() {
   searchQuery = this.value.trim(); currentPage = 1; renderTable();
 });
 
-function getRangeData(range) {
-  const now = Date.now();
-  const ms = { live: 2*60*60*1000, today: 24*60*60*1000, '3days': 3*24*60*60*1000, week: 7*24*60*60*1000, month: 30*24*60*60*1000 };
-  return allData.filter(d => new Date(d.recorded_at + ' UTC').getTime() >= now - (ms[range] || ms.live));
-}
-
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     this.classList.add('active');
     currentRange = this.dataset.range;
-    currentPage = 1;
-    loadHistory(currentRange);
+    currentPage  = 1;
   });
 });
 
-function refreshAll() {
-  if (allData.length === 0) return;
-  const latest   = allData[allData.length - 1];
-  const filtered = getRangeData(currentRange);
+function refreshAll(latest) {
   updateCards(latest);
-  updateCharts(filtered);
-  updateRainMeter(filtered.slice(-30).map(d => parseFloat(d.rain)));
+  updateCharts(allData.slice(-50));
+  updateRainMeter(allData.slice(-30).map(d => parseFloat(d.rain)));
   renderTable();
 }
 
+// ── RETRY / CONNECTION UI ──────────────────────
+function showRetryUI(errorMsg) {
+  const banner  = document.getElementById('retry-banner');
+  const detail  = document.getElementById('retry-detail-text');
+  const attempt = document.getElementById('retry-attempt');
+  const max     = document.getElementById('retry-max');
+  const title   = document.getElementById('retry-title-text');
+  const bar     = document.getElementById('retry-bar');
+
+  banner.style.display = 'block';
+
+  let friendlyMsg = 'Unable to reach sensor node.';
+  if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError') || errorMsg.includes('fetch')) {
+    friendlyMsg = 'Network error — ESP32 may be offline or out of WiFi range.';
+  } else if (errorMsg.includes('timeout') || errorMsg.includes('AbortError') || errorMsg.includes('abort')) {
+    friendlyMsg = 'Connection timed out — ESP32 is not responding within 4 seconds.';
+  } else if (errorMsg.includes('HTTP')) {
+    friendlyMsg = `Server error: ${errorMsg} — Check your API_URL in index.html.`;
+  } else if (errorMsg.includes('empty') || errorMsg.includes('invalid')) {
+    friendlyMsg = 'ESP32 responded but sent no sensor data — check Arduino code.';
+  }
+  detail.textContent = `⚠ ${friendlyMsg}`;
+
+  if (retryCount >= MAX_RETRIES) {
+    title.textContent = '❌ Connection Failed — Max retries reached. Refresh to try again.';
+    document.getElementById('retry-countdown').textContent = '--';
+    attempt.textContent = retryCount;
+    max.textContent     = MAX_RETRIES;
+    bar.style.width     = '0%';
+    if (countdownInterval) clearInterval(countdownInterval);
+    return;
+  }
+
+  attempt.textContent = retryCount;
+  max.textContent     = MAX_RETRIES;
+  title.textContent   = '⚠️ Connection Lost — Reconnecting...';
+
+  let secondsLeft = Math.round(REFRESH_MS / 1000);
+  document.getElementById('retry-countdown').textContent = secondsLeft;
+  bar.style.transition = 'none';
+  bar.style.width      = '100%';
+  setTimeout(() => { bar.style.transition = 'width 1s linear'; }, 50);
+
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    secondsLeft--;
+    document.getElementById('retry-countdown').textContent = Math.max(0, secondsLeft);
+    const pct = (secondsLeft / Math.round(REFRESH_MS / 1000)) * 100;
+    bar.style.width = Math.max(0, pct) + '%';
+    if (secondsLeft <= 0) clearInterval(countdownInterval);
+  }, 1000);
+}
+
+function clearRetryUI() {
+  document.getElementById('retry-banner').style.display = 'none';
+  if (countdownInterval) clearInterval(countdownInterval);
+}
+
+// ── FETCH LATEST FROM ESP32 ────────────────────
 async function fetchLatest() {
   try {
-    const res  = await fetch(API_URL + '?rows=1', { signal: AbortSignal.timeout(4000) });
+    const res  = await fetch(API_URL, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (!data || !data.node_id) throw new Error('empty');
+    if (!data || data.temperature === undefined) throw new Error('invalid response');
+
+    // ✅ Success
+    retryCount = 0;
+    clearRetryUI();
     document.getElementById('conn-dot').className     = 'online';
     document.getElementById('conn-label').textContent = 'Live';
-    if (allData.length === 0 || data.recorded_at !== allData[allData.length-1].recorded_at) {
-      allData.push(data);
-      if (allData.length > 1000) allData.shift();
-      refreshAll();
-    }
-  } catch {
+
+    // Add timestamp if ESP32 doesn't provide one
+    data.recorded_at = data.recorded_at || new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+    allData.push(data);
+    if (allData.length > 500) allData.shift();
+    refreshAll(data);
+
+  } catch (err) {
+    retryCount++;
     document.getElementById('conn-dot').className     = 'offline';
     document.getElementById('conn-label').textContent = 'Offline';
+    showRetryUI(err.message || err.toString());
   }
 }
 
-async function loadHistory(range = 'live') {
-  try {
-    const res  = await fetch(`${API_URL}?rows=500&range=${range}`, { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      allData = data;
-      document.getElementById('conn-dot').className     = 'online';
-      document.getElementById('conn-label').textContent = 'Live';
-      refreshAll();
-    } else {
-      document.getElementById('conn-dot').className     = 'offline';
-      document.getElementById('conn-label').textContent = 'No Data Yet';
-    }
-  } catch {
-    document.getElementById('conn-dot').className     = 'offline';
-    document.getElementById('conn-label').textContent = 'Offline';
-  }
-}
-
+// ── INIT ──────────────────────────────────────
 document.getElementById('conn-dot').className     = 'offline';
 document.getElementById('conn-label').textContent = 'Connecting...';
-loadHistory('live');
+fetchLatest();
 setInterval(fetchLatest, REFRESH_MS);
 </script>
 </body>
