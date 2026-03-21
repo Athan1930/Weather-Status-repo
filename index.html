@@ -8,235 +8,160 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #080c14;
-      --surface:   #0e1521;
-      --card:      #111927;
-      --border:    #1e2d42;
-      --border2:   #243446;
-      --text:      #d4e4f7;
-      --muted:     #5a7a99;
-      --accent:    #00d4ff;
-      --accent2:   #0088bb;
-      --green:     #00e5a0;
-      --yellow:    #f5c542;
-      --red:       #ff4d6d;
-      --orange:    #ff8c42;
-      --purple:    #b48eff;
-      --glow-b:    rgba(0,212,255,0.15);
-      --glow-g:    rgba(0,229,160,0.15);
-      --glow-r:    rgba(255,77,109,0.15);
+      --bg:#080c14;--surface:#0e1521;--card:#111927;--border:#1e2d42;--border2:#243446;
+      --text:#d4e4f7;--muted:#5a7a99;--accent:#00d4ff;--accent2:#0088bb;
+      --green:#00e5a0;--yellow:#f5c542;--red:#ff4d6d;--orange:#ff8c42;--purple:#b48eff;
+      --glow-b:rgba(0,212,255,0.15);--glow-g:rgba(0,229,160,0.15);--glow-r:rgba(255,77,109,0.15);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      background-image:
-        radial-gradient(ellipse at 20% 10%, rgba(0,60,100,0.3) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 90%, rgba(0,30,60,0.2) 0%, transparent 60%);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      min-height: 100vh;
-      padding: 24px;
-    }
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
-      background: linear-gradient(135deg, #1a0408 0%, #3d0c18 50%, #1a0408 100%);
-      border: 1px solid #6b1a2a; border-radius: 16px; padding: 18px 26px;
-      box-shadow: 0 4px 32px rgba(107,26,42,0.4), 0 0 60px rgba(107,26,42,0.1);
-      position: relative; overflow: hidden;
-    }
-    header::before {
-      content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(255,255,255,0.012) 28px, rgba(255,255,255,0.012) 29px);
-      pointer-events: none;
-    }
-    header::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, #d4a820, #f5c040, #d4a820, transparent);
-    }
-    .logo { display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; }
-    .ucv-seal { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #d4a820; box-shadow: 0 0 0 1px rgba(212,168,32,0.3), 0 0 20px rgba(212,168,32,0.5), 0 0 40px rgba(212,168,32,0.2); flex-shrink: 0; }
-    .logo-text { display: flex; flex-direction: column; gap: 2px; }
-    .logo-text h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.3px; color: #fff; line-height: 1.1; }
-    .logo-text h1 span { color: #f5c040; }
-    .node-tag { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
-    .ucv-motto { font-family: 'Syne', sans-serif; font-size: 0.68rem; color: #d4a820; font-style: italic; opacity: 0.85; }
-    #status-bar { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; position: relative; z-index: 1; }
-    #conn-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); transition: background 0.3s, box-shadow 0.3s; }
-    #conn-dot.online  { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    #conn-dot.offline { background: var(--red);   box-shadow: 0 0 8px var(--red); }
-    #last-update { color: rgba(255,255,255,0.3); font-family: 'Space Mono', monospace; font-size: 0.68rem; }
-
-    /* ── RETRY BANNER ── */
-    #retry-banner {
-      display: none;
-      background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.06));
-      border: 1px solid var(--red); border-radius: 10px;
-      padding: 14px 20px; margin-bottom: 20px;
-      font-family: 'Space Mono', monospace; font-size: 0.85rem; color: #ff9999;
-    }
-    #retry-banner .retry-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-    #retry-banner .retry-detail { color: rgba(255,150,150,0.7); font-size: 0.75rem; margin-bottom: 10px; }
-    #retry-countdown { color: var(--red); font-weight: 700; }
-    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,77,109,0.3); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; flex-shrink: 0; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .retry-progress { height: 4px; background: rgba(255,77,109,0.15); border-radius: 2px; overflow: hidden; margin-top: 8px; }
-    .retry-progress-bar { height: 100%; background: var(--red); border-radius: 2px; transition: width 1s linear; width: 100%; }
-
-    /* ── ALERT ── */
-    #alert-banner { display: none; background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.06)); border: 1px solid var(--red); border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; font-size: 0.95rem; font-weight: 600; color: #ff9999; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);background-image:radial-gradient(ellipse at 20% 10%,rgba(0,60,100,0.3) 0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(0,30,60,0.2) 0%,transparent 60%);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding:24px;}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;background:linear-gradient(135deg,#1a0408 0%,#3d0c18 50%,#1a0408 100%);border:1px solid #6b1a2a;border-radius:16px;padding:18px 26px;box-shadow:0 4px 32px rgba(107,26,42,0.4),0 0 60px rgba(107,26,42,0.1);position:relative;overflow:hidden;}
+    header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 28px,rgba(255,255,255,0.012) 28px,rgba(255,255,255,0.012) 29px);pointer-events:none;}
+    header::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#d4a820,#f5c040,#d4a820,transparent);}
+    .logo{display:flex;align-items:center;gap:18px;position:relative;z-index:1;}
+    .ucv-seal{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #d4a820;box-shadow:0 0 0 1px rgba(212,168,32,0.3),0 0 20px rgba(212,168,32,0.5),0 0 40px rgba(212,168,32,0.2);flex-shrink:0;}
+    .logo-text{display:flex;flex-direction:column;gap:2px;}
+    .logo-text h1{font-size:1.5rem;font-weight:800;letter-spacing:-0.3px;color:#fff;line-height:1.1;}
+    .logo-text h1 span{color:#f5c040;}
+    .node-tag{font-family:'Space Mono',monospace;font-size:0.68rem;color:rgba(255,255,255,0.45);margin-top:2px;}
+    .ucv-motto{font-family:'Syne',sans-serif;font-size:0.68rem;color:#d4a820;font-style:italic;opacity:0.85;}
+    #status-bar{display:flex;align-items:center;gap:10px;font-size:0.82rem;position:relative;z-index:1;}
+    #conn-dot{width:10px;height:10px;border-radius:50%;background:var(--muted);transition:background 0.3s,box-shadow 0.3s;}
+    #conn-dot.online{background:var(--green);box-shadow:0 0 8px var(--green);}
+    #conn-dot.offline{background:var(--red);box-shadow:0 0 8px var(--red);}
+    #last-update{color:rgba(255,255,255,0.3);font-family:'Space Mono',monospace;font-size:0.68rem;}
+    #retry-banner{display:none;background:linear-gradient(135deg,rgba(255,77,109,0.12),rgba(255,77,109,0.06));border:1px solid var(--red);border-radius:10px;padding:14px 20px;margin-bottom:20px;font-family:'Space Mono',monospace;font-size:0.85rem;color:#ff9999;}
+    #retry-banner .retry-title{font-weight:700;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+    #retry-banner .retry-detail{color:rgba(255,150,150,0.7);font-size:0.75rem;margin-bottom:10px;}
+    #retry-countdown{color:var(--red);font-weight:700;}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,77,109,0.3);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;flex-shrink:0;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .retry-progress{height:4px;background:rgba(255,77,109,0.15);border-radius:2px;overflow:hidden;margin-top:8px;}
+    .retry-progress-bar{height:100%;background:var(--red);border-radius:2px;transition:width 1s linear;width:100%;}
+    #alert-banner{display:none;background:linear-gradient(135deg,rgba(255,77,109,0.12),rgba(255,77,109,0.06));border:1px solid var(--red);border-radius:10px;padding:14px 20px;margin-bottom:20px;font-size:0.95rem;font-weight:600;color:#ff9999;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
 
     /* ── RELAY TEST PANEL ── */
-    .relay-test-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px; margin-bottom: 28px;
-    }
-    .relay-test-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
-    }
-    .relay-test-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
-    .relay-test-note {
-      font-family: 'Space Mono', monospace; font-size: 0.68rem;
-      color: var(--yellow); background: rgba(245,197,66,0.08);
-      border: 1px solid rgba(245,197,66,0.2); border-radius: 6px; padding: 4px 10px;
-    }
-    .relay-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-    .relay-btn {
-      font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700;
-      padding: 12px 20px; border-radius: 10px; border: 2px solid;
-      cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px;
-      justify-content: center;
-    }
-    .relay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .relay-test-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:28px;}
+    .relay-test-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+    .relay-test-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+    .relay-test-note{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--yellow);background:rgba(245,197,66,0.08);border:1px solid rgba(245,197,66,0.2);border-radius:6px;padding:4px 10px;}
+    .relay-buttons{display:flex;gap:12px;flex-wrap:wrap;}
+    .relay-btn{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;padding:12px 20px;border-radius:10px;border:2px solid;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;flex:1;min-width:160px;justify-content:center;}
+    .relay-btn:disabled{opacity:0.5;cursor:not-allowed;}
+    .relay-btn.btn-temp{background:rgba(255,77,109,0.1);border-color:var(--red);color:var(--red);}
+    .relay-btn.btn-temp:hover:not(:disabled){background:rgba(255,77,109,0.2);box-shadow:0 0 16px rgba(255,77,109,0.3);}
+    .relay-btn.btn-wind{background:rgba(180,142,255,0.1);border-color:var(--purple);color:var(--purple);}
+    .relay-btn.btn-wind:hover:not(:disabled){background:rgba(180,142,255,0.2);box-shadow:0 0 16px rgba(180,142,255,0.3);}
+    .relay-btn.btn-rain{background:rgba(0,212,255,0.1);border-color:var(--accent);color:var(--accent);}
+    .relay-btn.btn-rain:hover:not(:disabled){background:rgba(0,212,255,0.2);box-shadow:0 0 16px rgba(0,212,255,0.3);}
+    .relay-btn.btn-stop{background:rgba(90,122,153,0.1);border-color:var(--muted);color:var(--muted);flex:0;min-width:120px;}
+    .relay-btn.btn-stop:hover:not(:disabled){background:rgba(90,122,153,0.2);border-color:var(--text);color:var(--text);}
+    .relay-status{margin-top:14px;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
+    .relay-status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:all 0.3s;}
+    .relay-status-dot.active{background:var(--green);box-shadow:0 0 8px var(--green);}
+    .relay-threshold-info{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
+    .threshold-badge{font-family:'Space Mono',monospace;font-size:0.65rem;padding:3px 8px;border-radius:4px;border:1px solid;}
+    .threshold-badge.temp{color:var(--red);border-color:rgba(255,77,109,0.3);background:rgba(255,77,109,0.06);}
+    .threshold-badge.wind{color:var(--purple);border-color:rgba(180,142,255,0.3);background:rgba(180,142,255,0.06);}
+    .threshold-badge.rain{color:var(--accent);border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.06);}
 
-    /* Temperature — red */
-    .relay-btn.btn-temp {
-      background: rgba(255,77,109,0.1); border-color: var(--red); color: var(--red);
-    }
-    .relay-btn.btn-temp:hover:not(:disabled) {
-      background: rgba(255,77,109,0.2); box-shadow: 0 0 16px rgba(255,77,109,0.3);
-    }
+    /* ── WEB TERMINAL ── */
+    .terminal-card{background:#050a0f;border:1px solid var(--border);border-radius:14px;padding:0;margin-bottom:28px;overflow:hidden;}
+    .terminal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0a1018;border-bottom:1px solid var(--border);}
+    .terminal-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+    .terminal-dot{width:10px;height:10px;border-radius:50%;}
+    .td-red{background:#ff5f56;}
+    .td-yellow{background:#ffbd2e;}
+    .td-green{background:#27c93f;}
+    .terminal-controls{display:flex;gap:8px;align-items:center;}
+    .terminal-btn{font-family:'Space Mono',monospace;font-size:0.68rem;padding:4px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+    .terminal-btn:hover{border-color:var(--accent2);color:var(--accent);}
+    .terminal-btn.active{border-color:var(--green);color:var(--green);}
+    #terminal-output{font-family:'Space Mono',monospace;font-size:0.72rem;line-height:1.6;padding:16px 18px;height:280px;overflow-y:auto;color:#a8d8a8;background:#050a0f;}
+    #terminal-output .log-sensor{color:#5a7a99;}
+    #terminal-output .log-wifi{color:#00d4ff;}
+    #terminal-output .log-relay{color:#f5c542;}
+    #terminal-output .log-alert{color:#ff4d6d;font-weight:700;}
+    #terminal-output .log-server{color:#b48eff;}
+    #terminal-output .log-gsm{color:#ff8c42;}
+    #terminal-output .log-border{color:#1e2d42;}
+    #terminal-output .log-normal{color:#a8d8a8;}
+    .terminal-status{padding:6px 18px;background:#0a1018;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);display:flex;justify-content:space-between;}
 
-    /* Wind — purple */
-    .relay-btn.btn-wind {
-      background: rgba(180,142,255,0.1); border-color: var(--purple); color: var(--purple);
-    }
-    .relay-btn.btn-wind:hover:not(:disabled) {
-      background: rgba(180,142,255,0.2); box-shadow: 0 0 16px rgba(180,142,255,0.3);
-    }
-
-    /* Rain — accent blue */
-    .relay-btn.btn-rain {
-      background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent);
-    }
-    .relay-btn.btn-rain:hover:not(:disabled) {
-      background: rgba(0,212,255,0.2); box-shadow: 0 0 16px rgba(0,212,255,0.3);
-    }
-
-    /* Stop — muted */
-    .relay-btn.btn-stop {
-      background: rgba(90,122,153,0.1); border-color: var(--muted); color: var(--muted);
-      flex: 0; min-width: 120px;
-    }
-    .relay-btn.btn-stop:hover:not(:disabled) {
-      background: rgba(90,122,153,0.2); border-color: var(--text); color: var(--text);
-    }
-
-    .relay-status {
-      margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 0.75rem;
-      color: var(--muted); display: flex; align-items: center; gap: 8px;
-    }
-    .relay-status-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: all 0.3s;
-    }
-    .relay-status-dot.active { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .relay-threshold-info {
-      margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;
-    }
-    .threshold-badge {
-      font-family: 'Space Mono', monospace; font-size: 0.65rem;
-      padding: 3px 8px; border-radius: 4px; border: 1px solid;
-    }
-    .threshold-badge.temp { color: var(--red);    border-color: rgba(255,77,109,0.3);  background: rgba(255,77,109,0.06); }
-    .threshold-badge.wind { color: var(--purple);  border-color: rgba(180,142,255,0.3); background: rgba(180,142,255,0.06); }
-    .threshold-badge.rain { color: var(--accent);  border-color: rgba(0,212,255,0.3);   background: rgba(0,212,255,0.06); }
-
-    .time-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; align-items:center; }
-    .time-tabs label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-right:4px; }
-    .tab-btn { font-family: 'Space Mono', monospace; font-size:0.78rem; padding:7px 18px; border-radius:6px; border:1px solid var(--border2); background:var(--card); color:var(--muted); cursor:pointer; transition:all 0.2s; }
-    .tab-btn:hover { border-color:var(--accent2); color:var(--accent); }
-    .tab-btn.active { background: linear-gradient(135deg,var(--accent2),var(--accent)); border-color:var(--accent); color:#000; font-weight:700; box-shadow:0 0 12px var(--glow-b); }
-    .section-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
-    .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:28px; }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; position:relative; overflow:hidden; transition:border-color 0.3s,box-shadow 0.3s; }
-    .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:var(--c,var(--accent)); opacity:0.6; }
-    .card.warning { border-color:var(--red)!important; box-shadow:0 0 18px rgba(255,77,109,0.12); }
-    .card-icon { position:absolute; top:14px; right:14px; font-size:1.6rem; opacity:0.18; }
-    .card-label { font-size:0.67rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
-    .card-value { font-family:'Space Mono',monospace; font-size:2.6rem; font-weight:700; line-height:1; margin-bottom:4px; color: #00e5a0; text-shadow: 0 0 20px rgba(0,229,160,0.25); transition: color 0.3s, text-shadow 0.3s; }
-    .card.warning .card-value { color: #ff4d6d !important; text-shadow: 0 0 20px rgba(255,77,109,0.3) !important; }
-    .card-unit { font-size:0.82rem; color:var(--muted); }
-    .card-status { font-size:0.7rem; margin-top:10px; padding:3px 10px; border-radius:20px; display:inline-block; font-family:'Space Mono',monospace; }
-    .status-normal  { background:rgba(0,229,160,0.1); color:var(--green); }
-    .status-warning { background:rgba(255,77,109,0.12); color:var(--red); }
-    .gauges-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-bottom:28px; }
-    .gauge-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
-    .gauge-title { font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:16px; }
-    .ladder { display:flex; flex-direction:column; gap:6px; }
-    .ladder-row { display:flex; align-items:center; gap:10px; font-size:0.72rem; font-family:'Space Mono',monospace; }
-    .ladder-label { width:60px; color:var(--muted); text-align:right; }
-    .ladder-track { flex:1; height:14px; background:var(--surface); border-radius:4px; overflow:hidden; border:1px solid var(--border); }
-    .ladder-fill { height:100%; border-radius:4px; transition:width 0.6s ease; }
-    .ladder-val { width:44px; color:var(--text); }
-    .arc-gauge { text-align:center; }
-    .arc-gauge svg { overflow:visible; }
-    .charts-top-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-    .charts-bottom-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:0; }
-    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
-    .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-    .chart-title { font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); }
-    .chart-badge { font-family:'Space Mono',monospace; font-size:0.68rem; padding:2px 8px; border-radius:4px; background:var(--surface); border:1px solid var(--border); color:var(--muted); }
-    canvas { max-height:200px; cursor:crosshair; }
-    .map-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; display:flex; flex-direction:column; }
-    .map-card .chart-header { margin-bottom:10px; }
-    #map-container { flex:1; min-height:200px; border-radius:8px; overflow:hidden; border:1px solid var(--border2); position:relative; }
-    #map-iframe { width:100%; height:100%; min-height:200px; border:none; border-radius:8px; }
-    .map-coords { font-family:'Space Mono',monospace; font-size:0.65rem; color:var(--muted); margin-top:8px; display:flex; align-items:center; gap:6px; }
-    .map-live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); animation:blink 2s infinite; display:inline-block; flex-shrink:0; }
-    .charts-section { margin-bottom:28px; }
-    .table-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:28px; overflow-x:auto; }
-    .table-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
-    .table-title { font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); }
-    .table-search { font-family:'Space Mono',monospace; font-size:0.75rem; padding:6px 12px; border-radius:6px; border:1px solid var(--border2); background:var(--surface); color:var(--text); outline:none; width:180px; transition:border-color 0.2s; }
-    .table-search:focus { border-color:var(--accent); }
-    table { width:100%; border-collapse:collapse; font-size:0.82rem; }
-    thead th { font-family:'Space Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; cursor:pointer; user-select:none; white-space:nowrap; }
-    thead th:hover { color:var(--accent); }
-    .sort-arrow { margin-left:4px; opacity:0.4; }
-    tbody tr { border-bottom:1px solid rgba(30,45,66,0.5); transition:background 0.15s; }
-    tbody tr:hover { background:rgba(0,212,255,0.04); }
-    tbody td { padding:9px 12px; font-family:'Space Mono',monospace; font-size:0.78rem; white-space:nowrap; }
-    .td-temp { color:var(--red); } .td-hum { color:var(--accent); } .td-wind { color:var(--purple); } .td-time { color:var(--muted); font-size:0.72rem; }
-    .badge-rain { background:rgba(0,212,255,0.1); color:var(--accent); padding:2px 8px; border-radius:4px; }
-    .badge-dry  { background:rgba(0,229,160,0.1); color:var(--green); padding:2px 8px; border-radius:4px; }
-    .badge-high { background:rgba(255,77,109,0.1); color:var(--red); padding:2px 8px; border-radius:4px; }
-    .pagination { display:flex; gap:6px; margin-top:14px; align-items:center; flex-wrap:wrap; }
-    .page-btn { font-family:'Space Mono',monospace; font-size:0.72rem; padding:5px 11px; border-radius:5px; border:1px solid var(--border2); background:var(--surface); color:var(--muted); cursor:pointer; transition:all 0.15s; }
-    .page-btn:hover { border-color:var(--accent2); color:var(--accent); }
-    .page-btn.active { background:var(--accent2); border-color:var(--accent); color:#000; font-weight:700; }
-    .page-info { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted); margin-left:8px; }
-    footer { text-align:center; color:var(--muted); font-family:'Space Mono',monospace; font-size:0.68rem; margin-top:8px; }
-    .pulse-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:6px; animation:blink 4s linear infinite; vertical-align:middle; }
-    @keyframes blink { 0%,92%{opacity:1} 96%,100%{opacity:0} }
-    @media(max-width:768px) {
-      .charts-top-row, .charts-bottom-row { grid-template-columns:1fr; }
-      .gauges-grid { grid-template-columns:1fr; }
-      .relay-buttons { flex-direction: column; }
-      .relay-btn { min-width: unset; }
+    .time-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;align-items:center;}
+    .time-tabs label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-right:4px;}
+    .tab-btn{font-family:'Space Mono',monospace;font-size:0.78rem;padding:7px 18px;border-radius:6px;border:1px solid var(--border2);background:var(--card);color:var(--muted);cursor:pointer;transition:all 0.2s;}
+    .tab-btn:hover{border-color:var(--accent2);color:var(--accent);}
+    .tab-btn.active{background:linear-gradient(135deg,var(--accent2),var(--accent));border-color:var(--accent);color:#000;font-weight:700;box-shadow:0 0 12px var(--glow-b);}
+    .section-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--accent));opacity:0.6;}
+    .card.warning{border-color:var(--red)!important;box-shadow:0 0 18px rgba(255,77,109,0.12);}
+    .card-icon{position:absolute;top:14px;right:14px;font-size:1.6rem;opacity:0.18;}
+    .card-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;}
+    .card-value{font-family:'Space Mono',monospace;font-size:2.6rem;font-weight:700;line-height:1;margin-bottom:4px;color:#00e5a0;text-shadow:0 0 20px rgba(0,229,160,0.25);transition:color 0.3s,text-shadow 0.3s;}
+    .card.warning .card-value{color:#ff4d6d!important;text-shadow:0 0 20px rgba(255,77,109,0.3)!important;}
+    .card-unit{font-size:0.82rem;color:var(--muted);}
+    .card-status{font-size:0.7rem;margin-top:10px;padding:3px 10px;border-radius:20px;display:inline-block;font-family:'Space Mono',monospace;}
+    .status-normal{background:rgba(0,229,160,0.1);color:var(--green);}
+    .status-warning{background:rgba(255,77,109,0.12);color:var(--red);}
+    .gauges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:28px;}
+    .gauge-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .gauge-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:16px;}
+    .ladder{display:flex;flex-direction:column;gap:6px;}
+    .ladder-row{display:flex;align-items:center;gap:10px;font-size:0.72rem;font-family:'Space Mono',monospace;}
+    .ladder-label{width:60px;color:var(--muted);text-align:right;}
+    .ladder-track{flex:1;height:14px;background:var(--surface);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+    .ladder-fill{height:100%;border-radius:4px;transition:width 0.6s ease;}
+    .ladder-val{width:44px;color:var(--text);}
+    .arc-gauge{text-align:center;}
+    .arc-gauge svg{overflow:visible;}
+    .charts-top-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+    .charts-bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0;}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .chart-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+    .chart-badge{font-family:'Space Mono',monospace;font-size:0.68rem;padding:2px 8px;border-radius:4px;background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+    canvas{max-height:200px;cursor:crosshair;}
+    .map-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;}
+    .map-card .chart-header{margin-bottom:10px;}
+    #map-container{flex:1;min-height:200px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);position:relative;}
+    #map-iframe{width:100%;height:100%;min-height:200px;border:none;border-radius:8px;}
+    .map-coords{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:6px;}
+    .map-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite;display:inline-block;flex-shrink:0;}
+    .charts-section{margin-bottom:28px;}
+    .table-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:28px;overflow-x:auto;}
+    .table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+    .table-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+    .table-search{font-family:'Space Mono',monospace;font-size:0.75rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text);outline:none;width:180px;transition:border-color 0.2s;}
+    .table-search:focus{border-color:var(--accent);}
+    table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    thead th{font-family:'Space Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;cursor:pointer;user-select:none;white-space:nowrap;}
+    thead th:hover{color:var(--accent);}
+    .sort-arrow{margin-left:4px;opacity:0.4;}
+    tbody tr{border-bottom:1px solid rgba(30,45,66,0.5);transition:background 0.15s;}
+    tbody tr:hover{background:rgba(0,212,255,0.04);}
+    tbody td{padding:9px 12px;font-family:'Space Mono',monospace;font-size:0.78rem;white-space:nowrap;}
+    .td-temp{color:var(--red);}.td-hum{color:var(--accent);}.td-wind{color:var(--purple);}.td-time{color:var(--muted);font-size:0.72rem;}
+    .badge-rain{background:rgba(0,212,255,0.1);color:var(--accent);padding:2px 8px;border-radius:4px;}
+    .badge-dry{background:rgba(0,229,160,0.1);color:var(--green);padding:2px 8px;border-radius:4px;}
+    .badge-high{background:rgba(255,77,109,0.1);color:var(--red);padding:2px 8px;border-radius:4px;}
+    .pagination{display:flex;gap:6px;margin-top:14px;align-items:center;flex-wrap:wrap;}
+    .page-btn{font-family:'Space Mono',monospace;font-size:0.72rem;padding:5px 11px;border-radius:5px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+    .page-btn:hover{border-color:var(--accent2);color:var(--accent);}
+    .page-btn.active{background:var(--accent2);border-color:var(--accent);color:#000;font-weight:700;}
+    .page-info{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);margin-left:8px;}
+    footer{text-align:center;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.68rem;margin-top:8px;}
+    .pulse-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;animation:blink 4s linear infinite;vertical-align:middle;}
+    @keyframes blink{0%,92%{opacity:1}96%,100%{opacity:0}}
+    @media(max-width:768px){
+      .charts-top-row,.charts-bottom-row{grid-template-columns:1fr;}
+      .gauges-grid{grid-template-columns:1fr;}
+      .relay-buttons{flex-direction:column;}
+      .relay-btn{min-width:unset;}
     }
   </style>
 </head>
@@ -259,7 +184,6 @@
   </div>
 </header>
 
-<!-- RETRY BANNER -->
 <div id="retry-banner">
   <div class="retry-title">
     <span class="spinner"></span>
@@ -270,10 +194,9 @@
   <div class="retry-progress"><div class="retry-progress-bar" id="retry-bar"></div></div>
 </div>
 
-<!-- ALERT BANNER -->
 <div id="alert-banner">⚠️ <span id="alert-text"></span></div>
 
-<!-- ── RELAY TEST PANEL ── -->
+<!-- RELAY TEST PANEL -->
 <div class="section-label">🔊 Speaker Test — Highest Threshold Simulation</div>
 <div class="relay-test-card">
   <div class="relay-test-header">
@@ -281,23 +204,15 @@
     <div class="relay-test-note">⚠ Testing only — triggers relay for 5 seconds</div>
   </div>
   <div class="relay-buttons">
-    <button class="relay-btn btn-temp" onclick="testRelay('temp')" id="btn-temp">
-      🌡 Test Temperature Alert
-    </button>
-    <button class="relay-btn btn-wind" onclick="testRelay('wind')" id="btn-wind">
-      🌬 Test Wind Alert
-    </button>
-    <button class="relay-btn btn-rain" onclick="testRelay('rain')" id="btn-rain">
-      🌧 Test Rain Alert
-    </button>
-    <button class="relay-btn btn-stop" onclick="stopRelay()" id="btn-stop">
-      ⏹ Stop
-    </button>
+    <button class="relay-btn btn-temp" onclick="testRelay('temp')" id="btn-temp">🌡 Test Temperature Alert</button>
+    <button class="relay-btn btn-wind" onclick="testRelay('wind')" id="btn-wind">🌬 Test Wind Alert</button>
+    <button class="relay-btn btn-rain" onclick="testRelay('rain')" id="btn-rain">🌧 Test Rain Alert</button>
+    <button class="relay-btn btn-stop" onclick="stopRelay()" id="btn-stop">⏹ Stop</button>
   </div>
   <div class="relay-threshold-info">
-    <span class="threshold-badge temp">🌡 Temp Signal 3: &gt;40°C → Relay 3</span>
-    <span class="threshold-badge wind">🌬 Wind Signal 3: &gt;90 km/h → Relay 3</span>
-    <span class="threshold-badge rain">🌧 Rain Signal 3: &gt;15 mm → Relay 3</span>
+    <span class="threshold-badge temp">🌡 Temp &gt;40°C → GPIO 7 (Relay 3)</span>
+    <span class="threshold-badge wind">🌬 Wind &gt;90km/h → GPIO 7 (Relay 3)</span>
+    <span class="threshold-badge rain">🌧 Rain &gt;15mm → GPIO 7 (Relay 3)</span>
   </div>
   <div class="relay-status">
     <span class="relay-status-dot" id="relay-status-dot"></span>
@@ -305,44 +220,37 @@
   </div>
 </div>
 
+<!-- WEB TERMINAL -->
+<div class="section-label">🖥️ Live Terminal — ESP32 Serial Log</div>
+<div class="terminal-card">
+  <div class="terminal-header">
+    <div class="terminal-title">
+      <span class="terminal-dot td-red"></span>
+      <span class="terminal-dot td-yellow"></span>
+      <span class="terminal-dot td-green"></span>
+      &nbsp; NODE-01 Serial Monitor
+    </div>
+    <div class="terminal-controls">
+      <button class="terminal-btn active" id="btn-autoscroll" onclick="toggleAutoscroll()">⬇ Auto-scroll</button>
+      <button class="terminal-btn" onclick="clearTerminal()">🗑 Clear</button>
+      <button class="terminal-btn" id="btn-pause" onclick="togglePause()">⏸ Pause</button>
+    </div>
+  </div>
+  <div id="terminal-output"></div>
+  <div class="terminal-status">
+    <span id="terminal-line-count">0 lines</span>
+    <span id="terminal-refresh-status">Refreshing every 2s</span>
+  </div>
+</div>
+
 <!-- LIVE READINGS -->
 <div class="section-label">📟 Live Readings</div>
 <div class="cards-grid">
-  <div class="card" id="card-temp">
-    <div class="card-icon">🌡</div>
-    <div class="card-label">Temperature</div>
-    <div class="card-value" id="val-temp">--</div>
-    <div class="card-unit">°C</div>
-    <span class="card-status status-normal" id="status-temp">Normal</span>
-  </div>
-  <div class="card" id="card-hum">
-    <div class="card-icon">💧</div>
-    <div class="card-label">Humidity</div>
-    <div class="card-value" id="val-hum">--</div>
-    <div class="card-unit">%</div>
-    <span class="card-status status-normal" id="status-hum">Normal</span>
-  </div>
-  <div class="card" id="card-wind">
-    <div class="card-icon">🌬</div>
-    <div class="card-label">Wind Speed</div>
-    <div class="card-value" id="val-wind">--</div>
-    <div class="card-unit">km/h</div>
-    <span class="card-status status-normal" id="status-wind">Normal</span>
-  </div>
-  <div class="card" id="card-rain">
-    <div class="card-icon">🌧</div>
-    <div class="card-label">Rain (mm)</div>
-    <div class="card-value" id="val-rain" style="font-size:1.8rem">--</div>
-    <div class="card-unit">mm this interval</div>
-    <span class="card-status status-normal" id="status-rain">Normal</span>
-  </div>
-  <div class="card" id="card-totalrain">
-    <div class="card-icon">🌊</div>
-    <div class="card-label">Total Rain</div>
-    <div class="card-value" id="val-totalrain" style="font-size:1.8rem">--</div>
-    <div class="card-unit">mm accumulated</div>
-    <span class="card-status status-normal" id="status-totalrain">Normal</span>
-  </div>
+  <div class="card" id="card-temp"><div class="card-icon">🌡</div><div class="card-label">Temperature</div><div class="card-value" id="val-temp">--</div><div class="card-unit">°C</div><span class="card-status status-normal" id="status-temp">Normal</span></div>
+  <div class="card" id="card-hum"><div class="card-icon">💧</div><div class="card-label">Humidity</div><div class="card-value" id="val-hum">--</div><div class="card-unit">%</div><span class="card-status status-normal" id="status-hum">Normal</span></div>
+  <div class="card" id="card-wind"><div class="card-icon">🌬</div><div class="card-label">Wind Speed</div><div class="card-value" id="val-wind">--</div><div class="card-unit">km/h</div><span class="card-status status-normal" id="status-wind">Normal</span></div>
+  <div class="card" id="card-rain"><div class="card-icon">🌧</div><div class="card-label">Rain (mm)</div><div class="card-value" id="val-rain" style="font-size:1.8rem">--</div><div class="card-unit">mm this interval</div><span class="card-status status-normal" id="status-rain">Normal</span></div>
+  <div class="card" id="card-totalrain"><div class="card-icon">🌊</div><div class="card-label">Total Rain</div><div class="card-value" id="val-totalrain" style="font-size:1.8rem">--</div><div class="card-unit">mm accumulated</div><span class="card-status status-normal" id="status-totalrain">Normal</span></div>
 </div>
 
 <div class="section-label">📊 Sensor Gauges</div>
@@ -351,13 +259,7 @@
     <div class="gauge-title">🌡 Temperature Arc Gauge</div>
     <div class="arc-gauge">
       <svg width="200" height="120" viewBox="0 0 200 120">
-        <defs>
-          <linearGradient id="tGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#00e5a0"/>
-            <stop offset="50%" style="stop-color:#f5c542"/>
-            <stop offset="100%" style="stop-color:#ff4d6d"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="tGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00e5a0"/><stop offset="50%" style="stop-color:#f5c542"/><stop offset="100%" style="stop-color:#ff4d6d"/></linearGradient></defs>
         <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#1e2d42" stroke-width="14" stroke-linecap="round"/>
         <path id="arc-temp-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#tGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251" style="transition:stroke-dashoffset 0.8s ease"/>
         <line id="arc-temp-needle" x1="100" y1="110" x2="100" y2="38" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" style="transform-origin:100px 110px;transform:rotate(0deg);transition:transform 0.8s ease"/>
@@ -373,12 +275,7 @@
     <div class="gauge-title">💧 Humidity Arc Gauge</div>
     <div class="arc-gauge">
       <svg width="200" height="120" viewBox="0 0 200 120">
-        <defs>
-          <linearGradient id="hGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#0088bb"/>
-            <stop offset="100%" style="stop-color:#00d4ff"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="hGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#0088bb"/><stop offset="100%" style="stop-color:#00d4ff"/></linearGradient></defs>
         <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#1e2d42" stroke-width="14" stroke-linecap="round"/>
         <path id="arc-hum-fill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#hGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251" style="transition:stroke-dashoffset 0.8s ease"/>
         <line id="arc-hum-needle" x1="100" y1="110" x2="100" y2="38" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" style="transform-origin:100px 110px;transform:rotate(0deg);transition:transform 0.8s ease"/>
@@ -423,56 +320,26 @@
 <div class="charts-section">
   <div class="charts-top-row">
     <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">🌡 Temperature (°C)</div>
-        <div class="chart-badge" id="badge-temp">--°C avg</div>
-      </div>
+      <div class="chart-header"><div class="chart-title">🌡 Temperature (°C)</div><div class="chart-badge" id="badge-temp">--°C avg</div></div>
       <canvas id="chart-temp"></canvas>
     </div>
     <div class="map-card">
       <div class="chart-header">
         <div class="chart-title">📍 Device Location — Live Map</div>
-        <div class="chart-badge" style="color:var(--green);border-color:var(--green);">
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;animation:blink 2s infinite;vertical-align:middle;"></span>
-          LIVE
-        </div>
+        <div class="chart-badge" style="color:var(--green);border-color:var(--green);"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;animation:blink 2s infinite;vertical-align:middle;"></span>LIVE</div>
       </div>
       <div id="map-container">
-        <iframe id="map-iframe"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=121.715,17.605,121.735,17.620&layer=mapnik&marker=17.6135,121.7276"
-          allowfullscreen loading="lazy" title="WSN Node-01 Deployment Location">
-        </iframe>
+        <iframe id="map-iframe" src="https://www.openstreetmap.org/export/embed.html?bbox=121.715,17.605,121.735,17.620&layer=mapnik&marker=17.6135,121.7276" allowfullscreen loading="lazy" title="WSN Node-01 Deployment Location"></iframe>
       </div>
-      <div class="map-coords">
-        <span class="map-live-dot"></span>
-        <span>NODE-01 &nbsp;|&nbsp; 17.6135° N, 121.7276° E &nbsp;|&nbsp; Tuguegarao City, Cagayan, UCV &nbsp;|&nbsp; Alt: ~52m</span>
-      </div>
+      <div class="map-coords"><span class="map-live-dot"></span><span>NODE-01 &nbsp;|&nbsp; 17.6135° N, 121.7276° E &nbsp;|&nbsp; Tuguegarao City, Cagayan, UCV &nbsp;|&nbsp; Alt: ~52m</span></div>
     </div>
   </div>
   <div class="charts-bottom-row" style="margin-top:14px;">
-    <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">💧 Humidity (%)</div>
-        <div class="chart-badge" id="badge-hum">--% avg</div>
-      </div>
-      <canvas id="chart-hum"></canvas>
-    </div>
-    <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">🌬 Wind Speed (km/h)</div>
-        <div class="chart-badge" id="badge-wind">-- km/h avg</div>
-      </div>
-      <canvas id="chart-wind"></canvas>
-    </div>
+    <div class="chart-card"><div class="chart-header"><div class="chart-title">💧 Humidity (%)</div><div class="chart-badge" id="badge-hum">--% avg</div></div><canvas id="chart-hum"></canvas></div>
+    <div class="chart-card"><div class="chart-header"><div class="chart-title">🌬 Wind Speed (km/h)</div><div class="chart-badge" id="badge-wind">-- km/h avg</div></div><canvas id="chart-wind"></canvas></div>
   </div>
   <div style="margin-top:14px;">
-    <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">🌧 Rainfall per Interval (mm)</div>
-        <div class="chart-badge" id="badge-rain">-- mm total</div>
-      </div>
-      <canvas id="chart-rain"></canvas>
-    </div>
+    <div class="chart-card"><div class="chart-header"><div class="chart-title">🌧 Rainfall per Interval (mm)</div><div class="chart-badge" id="badge-rain">-- mm total</div></div><canvas id="chart-rain"></canvas></div>
   </div>
 </div>
 
@@ -514,420 +381,311 @@
 
 <script>
 document.getElementById('ucv-logo').src = 'https://upload.wikimedia.org/wikipedia/en/5/5c/University_of_Cagayan_Valley_official_seal.png';
-document.getElementById('ucv-logo').onerror = function() {
-  this.onerror = null;
-  this.src = 'https://www.ucv.edu.ph/assets/images/ucv-seal.png';
-};
+document.getElementById('ucv-logo').onerror = function() { this.onerror=null; this.src='https://www.ucv.edu.ph/assets/images/ucv-seal.png'; };
 
-// ─────────────────────────────────────────────
-//  !! IMPORTANT: Set this to your ESP32's IP !!
-// ─────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────
 const API_URL    = 'http://192.168.1.9/api/sensors';
+const LOG_URL    = 'http://192.168.1.9/api/log';
 const RELAY_URL  = 'http://192.168.1.9/relay';
-const REFRESH_MS = 3000;   // fetch every 3 seconds
-const RETRY_COUNTDOWN_SEC = 10;  // ← 10 second retry
+const REFRESH_MS = 3000;
+const LOG_REFRESH_MS = 2000;
+const RETRY_COUNTDOWN_SEC = 10;
 const MAX_RETRIES = 5;
 const THRESH_WIND = 25;
 const THRESH_TEMP = 38;
 const THRESH_RAIN = 0;
 
-let retryCount        = 0;
-let countdownInterval = null;
-let currentRange      = 'live';
-let allData           = [];
-let sortKey           = 'time';
-let sortAsc           = false;
-let currentPage       = 1;
-const PAGE_SIZE       = 10;
-let searchQuery       = '';
-let relayBusy         = false;
+let retryCount = 0, countdownInterval = null;
+let currentRange = 'live', allData = [], sortKey = 'time', sortAsc = false;
+let currentPage = 1, searchQuery = '';
+const PAGE_SIZE = 10;
+let relayBusy = false;
+let terminalAutoscroll = true;
+let terminalPaused = false;
+let lastLogCount = 0;
 
-// ── RELAY TEST CONTROL ─────────────────────────
-// Each sensor button triggers Signal 3 (highest threshold)
-// on its dedicated relay:
-//   Temperature → /relay?sensor=temp  → Relay 3 (Signal 3)
-//   Wind        → /relay?sensor=wind  → Relay 3 (Signal 3)
-//   Rain        → /relay?sensor=rain  → Relay 3 (Signal 3)
+// ─── TERMINAL ─────────────────────────────────
+function colorLine(line) {
+  if (line.includes('[SENSOR]'))  return `<span class="log-sensor">${line}</span>`;
+  if (line.includes('[WiFi]'))    return `<span class="log-wifi">${line}</span>`;
+  if (line.includes('[RELAY]'))   return `<span class="log-relay">${line}</span>`;
+  if (line.includes('[ALERT]'))   return `<span class="log-alert">${line}</span>`;
+  if (line.includes('[SERVER]'))  return `<span class="log-server">${line}</span>`;
+  if (line.includes('[GSM]'))     return `<span class="log-gsm">${line}</span>`;
+  if (line.startsWith('│') || line.startsWith('┌') || line.startsWith('└') || line.startsWith('├') || line.startsWith('╔') || line.startsWith('╚') || line.startsWith('║')) {
+    return `<span class="log-border">${line}</span>`;
+  }
+  return `<span class="log-normal">${line}</span>`;
+}
 
+async function fetchLog() {
+  if (terminalPaused) return;
+  try {
+    const res  = await fetch(LOG_URL, { signal: AbortSignal.timeout(3000) });
+    const lines = await res.json();
+    if (!Array.isArray(lines)) return;
+    const out = document.getElementById('terminal-output');
+    const wasAtBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 5;
+    out.innerHTML = lines.map(l => colorLine(l)).join('<br>');
+    document.getElementById('terminal-line-count').textContent = lines.length + ' lines';
+    if (terminalAutoscroll && wasAtBottom) {
+      out.scrollTop = out.scrollHeight;
+    }
+  } catch { /* silently fail if ESP32 offline */ }
+}
+
+function toggleAutoscroll() {
+  terminalAutoscroll = !terminalAutoscroll;
+  const btn = document.getElementById('btn-autoscroll');
+  btn.className = terminalAutoscroll ? 'terminal-btn active' : 'terminal-btn';
+  btn.textContent = terminalAutoscroll ? '⬇ Auto-scroll' : '⬇ Auto-scroll';
+}
+
+function togglePause() {
+  terminalPaused = !terminalPaused;
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = terminalPaused ? '▶ Resume' : '⏸ Pause';
+  btn.className   = terminalPaused ? 'terminal-btn active' : 'terminal-btn';
+  document.getElementById('terminal-refresh-status').textContent = terminalPaused ? 'Paused' : 'Refreshing every 2s';
+}
+
+function clearTerminal() {
+  document.getElementById('terminal-output').innerHTML = '';
+  document.getElementById('terminal-line-count').textContent = '0 lines';
+}
+
+// ─── RELAY CONTROL ─────────────────────────────
 async function testRelay(sensor) {
   if (relayBusy) return;
   relayBusy = true;
-
-  const labels = {
-    temp: '🌡 Temperature Alert (>40°C threshold)',
-    wind: '🌬 Wind Alert (>90 km/h threshold)',
-    rain: '🌧 Rain Alert (>15 mm threshold)'
-  };
-
-  setRelayStatus(true, `Triggering ${labels[sensor]}...`);
+  const labels = { temp:'🌡 Temperature Alert (>40°C)', wind:'🌬 Wind Alert (>90km/h)', rain:'🌧 Rain Alert (>15mm)' };
+  setRelayStatus(true, 'Triggering ' + labels[sensor] + '...');
   disableAllButtons(true);
-
   try {
-    const res = await fetch(`${RELAY_URL}?sensor=${sensor}`, {
-      signal: AbortSignal.timeout(8000)
-    });
+    const res = await fetch(`${RELAY_URL}?sensor=${sensor}`, { signal: AbortSignal.timeout(8000) });
     if (res.ok) {
-      setRelayStatus(true, `✓ ${labels[sensor]} — relay active for 5 seconds`);
-      setTimeout(() => {
-        setRelayStatus(false, 'Idle — no test active');
-        disableAllButtons(false);
-        relayBusy = false;
-      }, 5500);
-    } else {
-      throw new Error(`HTTP ${res.status}`);
-    }
-  } catch (err) {
-    setRelayStatus(false, `❌ Failed — is ESP32 online? (${err.message})`);
-    disableAllButtons(false);
-    relayBusy = false;
+      setRelayStatus(true, '✓ ' + labels[sensor] + ' — relay active for 5 seconds');
+      setTimeout(() => { setRelayStatus(false,'Idle — no test active'); disableAllButtons(false); relayBusy=false; }, 5500);
+    } else { throw new Error('HTTP ' + res.status); }
+  } catch(err) {
+    setRelayStatus(false, '❌ Failed — is ESP32 online? (' + err.message + ')');
+    disableAllButtons(false); relayBusy=false;
   }
 }
 
 async function stopRelay() {
-  setRelayStatus(false, 'Stopping relay...');
-  try {
-    await fetch(`${RELAY_URL}?sensor=stop`, { signal: AbortSignal.timeout(4000) });
-    setRelayStatus(false, 'Relay stopped ✓');
-  } catch {
-    setRelayStatus(false, 'Stop sent (relay may already be off)');
-  }
-  disableAllButtons(false);
-  relayBusy = false;
+  setRelayStatus(false,'Stopping relay...');
+  try { await fetch(`${RELAY_URL}?sensor=stop`, { signal: AbortSignal.timeout(4000) }); } catch {}
+  setRelayStatus(false,'Relay stopped ✓');
+  disableAllButtons(false); relayBusy=false;
 }
 
 function setRelayStatus(active, text) {
-  document.getElementById('relay-status-dot').className = 'relay-status-dot' + (active ? ' active' : '');
+  document.getElementById('relay-status-dot').className = 'relay-status-dot' + (active?' active':'');
   document.getElementById('relay-status-text').textContent = text;
 }
 
-function disableAllButtons(disabled) {
-  ['btn-temp', 'btn-wind', 'btn-rain', 'btn-stop'].forEach(id => {
-    document.getElementById(id).disabled = disabled;
-  });
+function disableAllButtons(d) {
+  ['btn-temp','btn-wind','btn-rain','btn-stop'].forEach(id => document.getElementById(id).disabled = d);
 }
 
-// ── Charts ─────────────────────────────────────
+// ─── CHARTS ───────────────────────────────────
 const chartCfg = (color, fill) => ({
-  type: 'line',
-  options: {
-    responsive: true,
-    interaction: { mode: 'index', intersect: false },
-    animation: { duration: 400 },
-    plugins: {
-      legend: { display: false },
-      tooltip: { backgroundColor: '#111927', borderColor: color, borderWidth: 1, titleColor: '#8b949e', bodyColor: '#d4e4f7', padding: 10, cornerRadius: 8 }
-    },
-    scales: {
-      x: { ticks: { color: '#5a7a99', maxTicksLimit: 6, font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a2535' } },
-      y: { ticks: { color: '#5a7a99', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a2535' } }
-    }
-  },
-  data: { labels: [], datasets: [{ data: [], borderColor: color, backgroundColor: fill, fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: color, borderWidth: 2 }] }
+  type:'line',
+  options:{responsive:true,interaction:{mode:'index',intersect:false},animation:{duration:400},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#111927',borderColor:color,borderWidth:1,titleColor:'#8b949e',bodyColor:'#d4e4f7',padding:10,cornerRadius:8}},
+    scales:{x:{ticks:{color:'#5a7a99',maxTicksLimit:6,font:{family:'Space Mono',size:9}},grid:{color:'#1a2535'}},
+            y:{ticks:{color:'#5a7a99',font:{family:'Space Mono',size:9}},grid:{color:'#1a2535'}}}},
+  data:{labels:[],datasets:[{data:[],borderColor:color,backgroundColor:fill,fill:true,tension:0.4,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:color,borderWidth:2}]}
 });
-
-const tempChart = new Chart(document.getElementById('chart-temp'), chartCfg('#ff4d6d', 'rgba(255,77,109,0.08)'));
-const humChart  = new Chart(document.getElementById('chart-hum'),  chartCfg('#00d4ff', 'rgba(0,212,255,0.08)'));
-const windChart = new Chart(document.getElementById('chart-wind'), chartCfg('#b48eff', 'rgba(180,142,255,0.08)'));
+const tempChart = new Chart(document.getElementById('chart-temp'), chartCfg('#ff4d6d','rgba(255,77,109,0.08)'));
+const humChart  = new Chart(document.getElementById('chart-hum'),  chartCfg('#00d4ff','rgba(0,212,255,0.08)'));
+const windChart = new Chart(document.getElementById('chart-wind'), chartCfg('#b48eff','rgba(180,142,255,0.08)'));
 const rainChart = new Chart(document.getElementById('chart-rain'), {
-  type: 'bar',
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#111927', borderColor: '#00d4ff', borderWidth: 1, titleColor: '#8b949e', bodyColor: '#d4e4f7', padding: 10, cornerRadius: 8 } },
-    scales: {
-      x: { ticks: { color: '#5a7a99', maxTicksLimit: 8, font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a2535' } },
-      y: { ticks: { color: '#5a7a99', font: { family: 'Space Mono', size: 9 } }, grid: { color: '#1a2535' }, min: 0 }
-    }
-  },
-  data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(0,212,255,0.4)', borderColor: '#00d4ff', borderWidth: 1, borderRadius: 4 }] }
+  type:'bar',
+  options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#111927',borderColor:'#00d4ff',borderWidth:1,titleColor:'#8b949e',bodyColor:'#d4e4f7',padding:10,cornerRadius:8}},
+    scales:{x:{ticks:{color:'#5a7a99',maxTicksLimit:8,font:{family:'Space Mono',size:9}},grid:{color:'#1a2535'}},
+            y:{ticks:{color:'#5a7a99',font:{family:'Space Mono',size:9}},grid:{color:'#1a2535'},min:0}}},
+  data:{labels:[],datasets:[{data:[],backgroundColor:'rgba(0,212,255,0.4)',borderColor:'#00d4ff',borderWidth:1,borderRadius:4}]}
 });
 
 function updateCharts(data) {
-  const now    = Date.now();
-  const labels = data.map((d, i) => {
-    if (d.recorded_at) return new Date(d.recorded_at + ' UTC').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    return new Date(now - (data.length - i) * REFRESH_MS).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  });
-  const temps = data.map(d => parseFloat(d.temperature));
-  const hums  = data.map(d => parseFloat(d.humidity));
-  const winds = data.map(d => parseFloat(d.wind_speed));
-  const rains = data.map(d => parseFloat(d.rain));
-  [[tempChart, temps], [humChart, hums], [windChart, winds]].forEach(([c, d]) => {
-    c.data.labels = labels; c.data.datasets[0].data = d; c.update();
-  });
-  rainChart.data.labels = labels;
-  rainChart.data.datasets[0].data = rains;
-  rainChart.update();
-  const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : '--';
-  document.getElementById('badge-temp').textContent = avg(temps) + '°C avg';
-  document.getElementById('badge-hum').textContent  = avg(hums)  + '% avg';
-  document.getElementById('badge-wind').textContent = avg(winds) + ' km/h avg';
-  document.getElementById('badge-rain').textContent = rains.reduce((a, b) => a + b, 0).toFixed(2) + ' mm total';
+  const now=Date.now();
+  const labels=data.map((d,i)=>d.recorded_at?new Date(d.recorded_at+' UTC').toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):new Date(now-(data.length-i)*REFRESH_MS).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  const temps=data.map(d=>parseFloat(d.temperature)), hums=data.map(d=>parseFloat(d.humidity));
+  const winds=data.map(d=>parseFloat(d.wind_speed)), rains=data.map(d=>parseFloat(d.rain));
+  [[tempChart,temps],[humChart,hums],[windChart,winds]].forEach(([c,d])=>{c.data.labels=labels;c.data.datasets[0].data=d;c.update();});
+  rainChart.data.labels=labels; rainChart.data.datasets[0].data=rains; rainChart.update();
+  const avg=arr=>arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1):'--';
+  document.getElementById('badge-temp').textContent=avg(temps)+'°C avg';
+  document.getElementById('badge-hum').textContent=avg(hums)+'% avg';
+  document.getElementById('badge-wind').textContent=avg(winds)+' km/h avg';
+  document.getElementById('badge-rain').textContent=rains.reduce((a,b)=>a+b,0).toFixed(2)+' mm total';
 }
 
-function updateArcGauge(fillId, needleId, valId, value, min, max) {
-  const pct = Math.min(1, Math.max(0, (value - min) / (max - min)));
-  document.getElementById(fillId).setAttribute('stroke-dashoffset', (251 * (1 - pct)).toFixed(1));
-  document.getElementById(needleId).style.transform = `rotate(${-90 + pct * 180}deg)`;
-  document.getElementById(valId).textContent = value.toFixed(1);
+function updateArcGauge(fillId,needleId,valId,value,min,max) {
+  const pct=Math.min(1,Math.max(0,(value-min)/(max-min)));
+  document.getElementById(fillId).setAttribute('stroke-dashoffset',(251*(1-pct)).toFixed(1));
+  document.getElementById(needleId).style.transform=`rotate(${-90+pct*180}deg)`;
+  document.getElementById(valId).textContent=value.toFixed(1);
 }
 
 function updateWindLadder(speed) {
-  const levels = [
-    { id: 'lad-calm',   pct: Math.min(100, speed / 5 * 100) },
-    { id: 'lad-breeze', pct: Math.min(100, Math.max(0, (speed - 5)  / 10 * 100)) },
-    { id: 'lad-mod',    pct: Math.min(100, Math.max(0, (speed - 15) / 10 * 100)) },
-    { id: 'lad-strong', pct: Math.min(100, Math.max(0, (speed - 25) / 15 * 100)) },
-    { id: 'lad-storm',  pct: Math.min(100, Math.max(0, (speed - 40) / 40 * 100)) }
-  ];
-  levels.forEach(l => {
-    document.getElementById(l.id).style.width = l.pct.toFixed(0) + '%';
-    document.getElementById(l.id + '-v').textContent = l.pct.toFixed(0) + '%';
-  });
-  document.getElementById('wind-ladder-val').textContent = speed.toFixed(1) + ' km/h';
+  const levels=[{id:'lad-calm',pct:Math.min(100,speed/5*100)},{id:'lad-breeze',pct:Math.min(100,Math.max(0,(speed-5)/10*100))},{id:'lad-mod',pct:Math.min(100,Math.max(0,(speed-15)/10*100))},{id:'lad-strong',pct:Math.min(100,Math.max(0,(speed-25)/15*100))},{id:'lad-storm',pct:Math.min(100,Math.max(0,(speed-40)/40*100))}];
+  levels.forEach(l=>{document.getElementById(l.id).style.width=l.pct.toFixed(0)+'%';document.getElementById(l.id+'-v').textContent=l.pct.toFixed(0)+'%';});
+  document.getElementById('wind-ladder-val').textContent=speed.toFixed(1)+' km/h';
 }
 
 function updateRainMeter(rainHistory) {
-  const rainEvents = rainHistory.filter(r => r > 0).length;
-  const pct = rainHistory.length ? (rainEvents / rainHistory.length * 100) : 0;
-  document.getElementById('rain-bar').style.height = pct.toFixed(0) + '%';
-  document.getElementById('rain-bar-pct').textContent = pct.toFixed(0) + '% intervals w/ rain';
-  document.getElementById('rain-count').textContent = rainEvents + ' / ' + rainHistory.length;
-  const dots = document.getElementById('rain-dots');
-  dots.innerHTML = '';
-  rainHistory.slice(-30).forEach(r => {
-    const d = document.createElement('div');
-    d.style.cssText = `width:10px;height:10px;border-radius:2px;background:${r > 0 ? '#00d4ff' : '#1e2d42'};border:1px solid ${r > 0 ? '#0088bb' : '#243446'}`;
-    d.title = r > 0 ? r.toFixed(2) + ' mm' : 'Dry';
-    dots.appendChild(d);
-  });
+  const rainEvents=rainHistory.filter(r=>r>0).length;
+  const pct=rainHistory.length?(rainEvents/rainHistory.length*100):0;
+  document.getElementById('rain-bar').style.height=pct.toFixed(0)+'%';
+  document.getElementById('rain-bar-pct').textContent=pct.toFixed(0)+'% intervals w/ rain';
+  document.getElementById('rain-count').textContent=rainEvents+' / '+rainHistory.length;
+  const dots=document.getElementById('rain-dots'); dots.innerHTML='';
+  rainHistory.slice(-30).forEach(r=>{const d=document.createElement('div');d.style.cssText=`width:10px;height:10px;border-radius:2px;background:${r>0?'#00d4ff':'#1e2d42'};border:1px solid ${r>0?'#0088bb':'#243446'}`;d.title=r>0?r.toFixed(2)+' mm':'Dry';dots.appendChild(d);});
 }
 
-function setCardWarning(cardId, statusId, isWarning, warnText) {
-  const card = document.getElementById(cardId);
-  const stat = document.getElementById(statusId);
-  if (isWarning) {
-    card.classList.add('warning');
-    stat.textContent = warnText;
-    stat.className = 'card-status status-warning';
-  } else {
-    card.classList.remove('warning');
-    stat.textContent = 'Normal';
-    stat.className = 'card-status status-normal';
-  }
+function setCardWarning(cardId,statusId,isWarning,warnText) {
+  const card=document.getElementById(cardId), stat=document.getElementById(statusId);
+  if(isWarning){card.classList.add('warning');stat.textContent=warnText;stat.className='card-status status-warning';}
+  else{card.classList.remove('warning');stat.textContent='Normal';stat.className='card-status status-normal';}
 }
 
 function updateCards(d) {
-  const temp      = parseFloat(d.temperature);
-  const hum       = parseFloat(d.humidity);
-  const wind      = parseFloat(d.wind_speed);
-  const rain      = parseFloat(d.rain);
-  const totalRain = parseFloat(d.total_rain);
-  const isRaining = rain > THRESH_RAIN;
-  document.getElementById('val-temp').textContent      = temp.toFixed(1);
-  document.getElementById('val-hum').textContent       = hum.toFixed(0);
-  document.getElementById('val-wind').textContent      = wind.toFixed(1);
-  document.getElementById('val-rain').textContent      = isRaining ? '🌧 ' + rain.toFixed(2) : '☀️ 0.00';
-  document.getElementById('val-totalrain').textContent = totalRain.toFixed(2);
-  document.getElementById('last-update').textContent   = 'Updated: ' + new Date().toLocaleTimeString();
-  setCardWarning('card-temp',      'status-temp',      temp > THRESH_TEMP, 'High Temp!');
-  setCardWarning('card-wind',      'status-wind',      wind > THRESH_WIND, 'Strong Wind!');
-  setCardWarning('card-rain',      'status-rain',      isRaining,          'Rain Detected!');
-  setCardWarning('card-hum',       'status-hum',       false,              'Normal');
-  setCardWarning('card-totalrain', 'status-totalrain', totalRain > 50,     'Heavy Accumulation!');
-  const alerts = [];
-  if (isRaining)          alerts.push(`Rain: ${rain.toFixed(2)} mm`);
-  if (wind > THRESH_WIND) alerts.push(`High Wind: ${wind.toFixed(1)} km/h`);
-  if (temp > THRESH_TEMP) alerts.push(`High Temp: ${temp.toFixed(1)}°C`);
-  const banner = document.getElementById('alert-banner');
-  banner.style.display = alerts.length > 0 ? 'block' : 'none';
-  if (alerts.length) document.getElementById('alert-text').textContent = alerts.join('  |  ');
-  updateArcGauge('arc-temp-fill', 'arc-temp-needle', 'arc-temp-val', temp, 0, 50);
-  updateArcGauge('arc-hum-fill',  'arc-hum-needle',  'arc-hum-val',  hum,  0, 100);
+  const temp=parseFloat(d.temperature), hum=parseFloat(d.humidity), wind=parseFloat(d.wind_speed), rain=parseFloat(d.rain), totalRain=parseFloat(d.total_rain), isRaining=rain>THRESH_RAIN;
+  document.getElementById('val-temp').textContent=temp.toFixed(1);
+  document.getElementById('val-hum').textContent=hum.toFixed(0);
+  document.getElementById('val-wind').textContent=wind.toFixed(1);
+  document.getElementById('val-rain').textContent=isRaining?'🌧 '+rain.toFixed(2):'☀️ 0.00';
+  document.getElementById('val-totalrain').textContent=totalRain.toFixed(2);
+  document.getElementById('last-update').textContent='Updated: '+new Date().toLocaleTimeString();
+  setCardWarning('card-temp','status-temp',temp>THRESH_TEMP,'High Temp!');
+  setCardWarning('card-wind','status-wind',wind>THRESH_WIND,'Strong Wind!');
+  setCardWarning('card-rain','status-rain',isRaining,'Rain Detected!');
+  setCardWarning('card-hum','status-hum',false,'Normal');
+  setCardWarning('card-totalrain','status-totalrain',totalRain>50,'Heavy Accumulation!');
+  const alerts=[];
+  if(isRaining) alerts.push('Rain: '+rain.toFixed(2)+' mm');
+  if(wind>THRESH_WIND) alerts.push('High Wind: '+wind.toFixed(1)+' km/h');
+  if(temp>THRESH_TEMP) alerts.push('High Temp: '+temp.toFixed(1)+'°C');
+  const banner=document.getElementById('alert-banner');
+  banner.style.display=alerts.length>0?'block':'none';
+  if(alerts.length) document.getElementById('alert-text').textContent=alerts.join('  |  ');
+  updateArcGauge('arc-temp-fill','arc-temp-needle','arc-temp-val',temp,0,50);
+  updateArcGauge('arc-hum-fill','arc-hum-needle','arc-hum-val',hum,0,100);
   updateWindLadder(wind);
 }
 
 function renderTable() {
-  let rows = [...allData];
-  if (searchQuery) {
-    rows = rows.filter(d =>
-      (d.recorded_at || '').includes(searchQuery) ||
-      d.temperature.toString().includes(searchQuery) ||
-      d.humidity.toString().includes(searchQuery) ||
-      d.wind_speed.toString().includes(searchQuery) ||
-      d.rain.toString().includes(searchQuery)
-    );
-  }
-  rows.sort((a, b) => {
-    let va, vb;
-    if (sortKey === 'time') { va = new Date(a.recorded_at || 0); vb = new Date(b.recorded_at || 0); }
-    if (sortKey === 'temp') { va = parseFloat(a.temperature); vb = parseFloat(b.temperature); }
-    if (sortKey === 'hum')  { va = parseFloat(a.humidity);    vb = parseFloat(b.humidity); }
-    if (sortKey === 'wind') { va = parseFloat(a.wind_speed);  vb = parseFloat(b.wind_speed); }
-    if (sortKey === 'rain') { va = parseFloat(a.rain);        vb = parseFloat(b.rain); }
-    return sortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  let rows=[...allData];
+  if(searchQuery) rows=rows.filter(d=>(d.recorded_at||'').includes(searchQuery)||d.temperature.toString().includes(searchQuery)||d.humidity.toString().includes(searchQuery)||d.wind_speed.toString().includes(searchQuery)||d.rain.toString().includes(searchQuery));
+  rows.sort((a,b)=>{let va,vb;
+    if(sortKey==='time'){va=new Date(a.recorded_at||0);vb=new Date(b.recorded_at||0);}
+    if(sortKey==='temp'){va=parseFloat(a.temperature);vb=parseFloat(b.temperature);}
+    if(sortKey==='hum'){va=parseFloat(a.humidity);vb=parseFloat(b.humidity);}
+    if(sortKey==='wind'){va=parseFloat(a.wind_speed);vb=parseFloat(b.wind_speed);}
+    if(sortKey==='rain'){va=parseFloat(a.rain);vb=parseFloat(b.rain);}
+    return sortAsc?(va>vb?1:-1):(va<vb?1:-1);
   });
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  if (currentPage > totalPages) currentPage = totalPages;
-  const slice = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const tbody = document.getElementById('table-body');
-  tbody.innerHTML = '';
-  slice.forEach((d, i) => {
-    const ts        = d.recorded_at ? new Date(d.recorded_at + ' UTC').toLocaleString() : new Date().toLocaleTimeString();
-    const temp      = parseFloat(d.temperature);
-    const hum       = parseFloat(d.humidity);
-    const wind      = parseFloat(d.wind_speed);
-    const rain      = parseFloat(d.rain);
-    const totalRain = parseFloat(d.total_rain);
-    const isRaining = rain > 0;
-    const warn      = isRaining || temp > THRESH_TEMP || wind > THRESH_WIND;
-    const status    = isRaining ? 'RAIN' : (temp > THRESH_TEMP ? 'HIGH TEMP' : (wind > THRESH_WIND ? 'STRONG WIND' : 'OK'));
-    tbody.innerHTML += `
-      <tr>
-        <td class="td-time">${(currentPage-1)*PAGE_SIZE+i+1}</td>
-        <td class="td-time">${ts}</td>
-        <td class="td-temp">${temp.toFixed(1)}</td>
-        <td class="td-hum">${hum.toFixed(0)}</td>
-        <td class="td-wind">${wind.toFixed(1)}</td>
-        <td><span class="${isRaining ? 'badge-rain' : 'badge-dry'}">${isRaining ? '🌧 '+rain.toFixed(2) : '☀️ 0.00'}</span></td>
-        <td class="td-hum">${totalRain.toFixed(2)}</td>
-        <td><span class="${warn ? 'badge-high' : 'badge-dry'}">${status}</span></td>
-      </tr>`;
+  const totalPages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));
+  if(currentPage>totalPages) currentPage=totalPages;
+  const slice=rows.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
+  const tbody=document.getElementById('table-body'); tbody.innerHTML='';
+  slice.forEach((d,i)=>{
+    const ts=d.recorded_at?new Date(d.recorded_at+' UTC').toLocaleString():new Date().toLocaleTimeString();
+    const temp=parseFloat(d.temperature),hum=parseFloat(d.humidity),wind=parseFloat(d.wind_speed),rain=parseFloat(d.rain),totalRain=parseFloat(d.total_rain);
+    const isRaining=rain>0, warn=isRaining||temp>THRESH_TEMP||wind>THRESH_WIND;
+    const status=isRaining?'RAIN':(temp>THRESH_TEMP?'HIGH TEMP':(wind>THRESH_WIND?'STRONG WIND':'OK'));
+    tbody.innerHTML+=`<tr><td class="td-time">${(currentPage-1)*PAGE_SIZE+i+1}</td><td class="td-time">${ts}</td><td class="td-temp">${temp.toFixed(1)}</td><td class="td-hum">${hum.toFixed(0)}</td><td class="td-wind">${wind.toFixed(1)}</td><td><span class="${isRaining?'badge-rain':'badge-dry'}">${isRaining?'🌧 '+rain.toFixed(2):'☀️ 0.00'}</span></td><td class="td-hum">${totalRain.toFixed(2)}</td><td><span class="${warn?'badge-high':'badge-dry'}">${status}</span></td></tr>`;
   });
-  const pag = document.getElementById('pagination');
-  pag.innerHTML = '';
-  if (totalPages > 1) {
-    const addBtn = (lbl, pg, act) => {
-      const b = document.createElement('button');
-      b.className = 'page-btn' + (act ? ' active' : '');
-      b.textContent = lbl;
-      b.onclick = () => { currentPage = pg; renderTable(); };
-      pag.appendChild(b);
-    };
-    if (currentPage > 1) { addBtn('«', 1, false); addBtn('‹', currentPage-1, false); }
-    for (let p = Math.max(1, currentPage-1); p <= Math.min(totalPages, currentPage+1); p++) addBtn(p, p, p===currentPage);
-    if (currentPage < totalPages) { addBtn('›', currentPage+1, false); addBtn('»', totalPages, false); }
-    const info = document.createElement('span');
-    info.className = 'page-info';
-    info.textContent = rows.length + ' records';
-    pag.appendChild(info);
+  const pag=document.getElementById('pagination'); pag.innerHTML='';
+  if(totalPages>1){
+    const addBtn=(lbl,pg,act)=>{const b=document.createElement('button');b.className='page-btn'+(act?' active':'');b.textContent=lbl;b.onclick=()=>{currentPage=pg;renderTable();};pag.appendChild(b);};
+    if(currentPage>1){addBtn('«',1,false);addBtn('‹',currentPage-1,false);}
+    for(let p=Math.max(1,currentPage-1);p<=Math.min(totalPages,currentPage+1);p++) addBtn(p,p,p===currentPage);
+    if(currentPage<totalPages){addBtn('›',currentPage+1,false);addBtn('»',totalPages,false);}
+    const info=document.createElement('span');info.className='page-info';info.textContent=rows.length+' records';pag.appendChild(info);
   }
 }
 
 function sortTable(key) {
-  if (sortKey === key) sortAsc = !sortAsc; else { sortKey = key; sortAsc = false; }
-  currentPage = 1;
-  ['time','temp','hum','wind','rain'].forEach(k => {
-    const el = document.getElementById('sa-'+k);
-    if (el) el.textContent = k === sortKey ? (sortAsc ? '↑' : '↓') : '↕';
-  });
+  if(sortKey===key) sortAsc=!sortAsc; else{sortKey=key;sortAsc=false;}
+  currentPage=1;
+  ['time','temp','hum','wind','rain'].forEach(k=>{const el=document.getElementById('sa-'+k);if(el)el.textContent=k===sortKey?(sortAsc?'↑':'↓'):'↕';});
   renderTable();
 }
 
-document.getElementById('table-search').addEventListener('input', function() {
-  searchQuery = this.value.trim(); currentPage = 1; renderTable();
-});
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    currentRange = this.dataset.range;
-    currentPage  = 1;
-  });
-});
+document.getElementById('table-search').addEventListener('input',function(){searchQuery=this.value.trim();currentPage=1;renderTable();});
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');currentRange=this.dataset.range;currentPage=1;}));
 
 function refreshAll(latest) {
   updateCards(latest);
   updateCharts(allData.slice(-50));
-  updateRainMeter(allData.slice(-30).map(d => parseFloat(d.rain)));
+  updateRainMeter(allData.slice(-30).map(d=>parseFloat(d.rain)));
   renderTable();
 }
 
-// ── RETRY UI ───────────────────────────────────
 function showRetryUI(errorMsg) {
-  const banner  = document.getElementById('retry-banner');
-  const detail  = document.getElementById('retry-detail-text');
-  const attempt = document.getElementById('retry-attempt');
-  const max     = document.getElementById('retry-max');
-  const title   = document.getElementById('retry-title-text');
-  const bar     = document.getElementById('retry-bar');
-  banner.style.display = 'block';
-
-  let friendlyMsg = 'Unable to reach sensor node.';
-  if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError') || errorMsg.includes('fetch')) {
-    friendlyMsg = 'Network error — ESP32 may be offline or out of WiFi range.';
-  } else if (errorMsg.includes('timeout') || errorMsg.includes('AbortError') || errorMsg.includes('abort')) {
-    friendlyMsg = 'Connection timed out — ESP32 is not responding within 4 seconds.';
-  } else if (errorMsg.includes('HTTP')) {
-    friendlyMsg = `Server error: ${errorMsg} — Check your API_URL in index.html.`;
-  } else if (errorMsg.includes('empty') || errorMsg.includes('invalid')) {
-    friendlyMsg = 'ESP32 responded but sent no sensor data — check Arduino code.';
-  }
-  detail.textContent = `⚠ ${friendlyMsg}`;
-
-  if (retryCount >= MAX_RETRIES) {
-    title.textContent = '❌ Connection Failed — Max retries reached. Refresh to try again.';
-    document.getElementById('retry-countdown').textContent = '--';
-    attempt.textContent = retryCount;
-    max.textContent     = MAX_RETRIES;
-    bar.style.width     = '0%';
-    if (countdownInterval) clearInterval(countdownInterval);
+  const banner=document.getElementById('retry-banner');
+  banner.style.display='block';
+  let msg='Unable to reach sensor node.';
+  if(errorMsg.includes('fetch')||errorMsg.includes('NetworkError')) msg='Network error — ESP32 may be offline or out of WiFi range.';
+  else if(errorMsg.includes('timeout')||errorMsg.includes('abort')) msg='Connection timed out — ESP32 not responding within 4 seconds.';
+  else if(errorMsg.includes('HTTP')) msg='Server error: '+errorMsg;
+  else if(errorMsg.includes('invalid')) msg='ESP32 responded but sent no data — check Arduino code.';
+  document.getElementById('retry-detail-text').textContent='⚠ '+msg;
+  if(retryCount>=MAX_RETRIES){
+    document.getElementById('retry-title-text').textContent='❌ Connection Failed — Max retries reached. Refresh to try again.';
+    document.getElementById('retry-countdown').textContent='--';
+    document.getElementById('retry-attempt').textContent=retryCount;
+    document.getElementById('retry-max').textContent=MAX_RETRIES;
+    document.getElementById('retry-bar').style.width='0%';
+    if(countdownInterval) clearInterval(countdownInterval);
     return;
   }
-
-  attempt.textContent = retryCount;
-  max.textContent     = MAX_RETRIES;
-  title.textContent   = '⚠️ Connection Lost — Reconnecting...';
-
-  // ← 10 second countdown
-  let secondsLeft = RETRY_COUNTDOWN_SEC;
-  document.getElementById('retry-countdown').textContent = secondsLeft;
-  bar.style.transition = 'none';
-  bar.style.width      = '100%';
-  setTimeout(() => { bar.style.transition = 'width 1s linear'; }, 50);
-
-  if (countdownInterval) clearInterval(countdownInterval);
-  countdownInterval = setInterval(() => {
-    secondsLeft--;
-    document.getElementById('retry-countdown').textContent = Math.max(0, secondsLeft);
-    const pct = (secondsLeft / RETRY_COUNTDOWN_SEC) * 100;
-    bar.style.width = Math.max(0, pct) + '%';
-    if (secondsLeft <= 0) clearInterval(countdownInterval);
-  }, 1000);
+  document.getElementById('retry-attempt').textContent=retryCount;
+  document.getElementById('retry-max').textContent=MAX_RETRIES;
+  document.getElementById('retry-title-text').textContent='⚠️ Connection Lost — Reconnecting...';
+  let s=RETRY_COUNTDOWN_SEC;
+  document.getElementById('retry-countdown').textContent=s;
+  document.getElementById('retry-bar').style.transition='none';
+  document.getElementById('retry-bar').style.width='100%';
+  setTimeout(()=>{document.getElementById('retry-bar').style.transition='width 1s linear';},50);
+  if(countdownInterval) clearInterval(countdownInterval);
+  countdownInterval=setInterval(()=>{s--;document.getElementById('retry-countdown').textContent=Math.max(0,s);document.getElementById('retry-bar').style.width=Math.max(0,(s/RETRY_COUNTDOWN_SEC)*100)+'%';if(s<=0)clearInterval(countdownInterval);},1000);
 }
 
-function clearRetryUI() {
-  document.getElementById('retry-banner').style.display = 'none';
-  if (countdownInterval) clearInterval(countdownInterval);
-}
+function clearRetryUI(){document.getElementById('retry-banner').style.display='none';if(countdownInterval)clearInterval(countdownInterval);}
 
-// ── FETCH FROM ESP32 ───────────────────────────
 async function fetchLatest() {
   try {
-    const res  = await fetch(API_URL, { signal: AbortSignal.timeout(4000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (!data || data.temperature === undefined) throw new Error('invalid response');
-    retryCount = 0;
-    clearRetryUI();
-    document.getElementById('conn-dot').className     = 'online';
-    document.getElementById('conn-label').textContent = 'Live';
-    data.recorded_at = data.recorded_at || new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const res=await fetch(API_URL,{signal:AbortSignal.timeout(4000)});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data||data.temperature===undefined) throw new Error('invalid response');
+    retryCount=0; clearRetryUI();
+    document.getElementById('conn-dot').className='online';
+    document.getElementById('conn-label').textContent='Live';
+    data.recorded_at=data.recorded_at||new Date().toISOString().replace('T',' ').substring(0,19);
     allData.push(data);
-    if (allData.length > 500) allData.shift();
+    if(allData.length>500) allData.shift();
     refreshAll(data);
-  } catch (err) {
+  } catch(err) {
     retryCount++;
-    document.getElementById('conn-dot').className     = 'offline';
-    document.getElementById('conn-label').textContent = 'Offline';
-    showRetryUI(err.message || err.toString());
+    document.getElementById('conn-dot').className='offline';
+    document.getElementById('conn-label').textContent='Offline';
+    showRetryUI(err.message||err.toString());
   }
 }
 
-document.getElementById('conn-dot').className     = 'offline';
-document.getElementById('conn-label').textContent = 'Connecting...';
+// ─── INIT ─────────────────────────────────────
+document.getElementById('conn-dot').className='offline';
+document.getElementById('conn-label').textContent='Connecting...';
 fetchLatest();
 setInterval(fetchLatest, REFRESH_MS);
+setInterval(fetchLog, LOG_REFRESH_MS);
+fetchLog();
 </script>
 </body>
 </html>
