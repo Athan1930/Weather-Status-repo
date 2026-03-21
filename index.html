@@ -71,57 +71,98 @@
     #retry-banner {
       display: none;
       background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.06));
-      border: 1px solid var(--red);
-      border-radius: 10px;
-      padding: 14px 20px;
-      margin-bottom: 20px;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.85rem;
-      color: #ff9999;
+      border: 1px solid var(--red); border-radius: 10px;
+      padding: 14px 20px; margin-bottom: 20px;
+      font-family: 'Space Mono', monospace; font-size: 0.85rem; color: #ff9999;
     }
-    #retry-banner .retry-title {
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    #retry-banner .retry-detail {
-      color: rgba(255,150,150,0.7);
-      font-size: 0.75rem;
-      margin-bottom: 10px;
-    }
+    #retry-banner .retry-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+    #retry-banner .retry-detail { color: rgba(255,150,150,0.7); font-size: 0.75rem; margin-bottom: 10px; }
     #retry-countdown { color: var(--red); font-weight: 700; }
-    .spinner {
-      display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,77,109,0.3);
-      border-top-color: var(--red);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle;
-      flex-shrink: 0;
-    }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,77,109,0.3); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .retry-progress {
-      height: 4px;
-      background: rgba(255,77,109,0.15);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .retry-progress-bar {
-      height: 100%;
-      background: var(--red);
-      border-radius: 2px;
-      transition: width 1s linear;
-      width: 100%;
-    }
+    .retry-progress { height: 4px; background: rgba(255,77,109,0.15); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+    .retry-progress-bar { height: 100%; background: var(--red); border-radius: 2px; transition: width 1s linear; width: 100%; }
 
     /* ── ALERT ── */
     #alert-banner { display: none; background: linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.06)); border: 1px solid var(--red); border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; font-size: 0.95rem; font-weight: 600; color: #ff9999; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+
+    /* ── RELAY TEST PANEL ── */
+    .relay-test-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px; margin-bottom: 28px;
+    }
+    .relay-test-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+    }
+    .relay-test-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+    .relay-test-note {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      color: var(--yellow); background: rgba(245,197,66,0.08);
+      border: 1px solid rgba(245,197,66,0.2); border-radius: 6px; padding: 4px 10px;
+    }
+    .relay-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .relay-btn {
+      font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700;
+      padding: 12px 20px; border-radius: 10px; border: 2px solid;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px;
+      justify-content: center;
+    }
+    .relay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Temperature — red */
+    .relay-btn.btn-temp {
+      background: rgba(255,77,109,0.1); border-color: var(--red); color: var(--red);
+    }
+    .relay-btn.btn-temp:hover:not(:disabled) {
+      background: rgba(255,77,109,0.2); box-shadow: 0 0 16px rgba(255,77,109,0.3);
+    }
+
+    /* Wind — purple */
+    .relay-btn.btn-wind {
+      background: rgba(180,142,255,0.1); border-color: var(--purple); color: var(--purple);
+    }
+    .relay-btn.btn-wind:hover:not(:disabled) {
+      background: rgba(180,142,255,0.2); box-shadow: 0 0 16px rgba(180,142,255,0.3);
+    }
+
+    /* Rain — accent blue */
+    .relay-btn.btn-rain {
+      background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent);
+    }
+    .relay-btn.btn-rain:hover:not(:disabled) {
+      background: rgba(0,212,255,0.2); box-shadow: 0 0 16px rgba(0,212,255,0.3);
+    }
+
+    /* Stop — muted */
+    .relay-btn.btn-stop {
+      background: rgba(90,122,153,0.1); border-color: var(--muted); color: var(--muted);
+      flex: 0; min-width: 120px;
+    }
+    .relay-btn.btn-stop:hover:not(:disabled) {
+      background: rgba(90,122,153,0.2); border-color: var(--text); color: var(--text);
+    }
+
+    .relay-status {
+      margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 0.75rem;
+      color: var(--muted); display: flex; align-items: center; gap: 8px;
+    }
+    .relay-status-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: all 0.3s;
+    }
+    .relay-status-dot.active { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .relay-threshold-info {
+      margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .threshold-badge {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      padding: 3px 8px; border-radius: 4px; border: 1px solid;
+    }
+    .threshold-badge.temp { color: var(--red);    border-color: rgba(255,77,109,0.3);  background: rgba(255,77,109,0.06); }
+    .threshold-badge.wind { color: var(--purple);  border-color: rgba(180,142,255,0.3); background: rgba(180,142,255,0.06); }
+    .threshold-badge.rain { color: var(--accent);  border-color: rgba(0,212,255,0.3);   background: rgba(0,212,255,0.06); }
 
     .time-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; align-items:center; }
     .time-tabs label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-right:4px; }
@@ -194,6 +235,8 @@
     @media(max-width:768px) {
       .charts-top-row, .charts-bottom-row { grid-template-columns:1fr; }
       .gauges-grid { grid-template-columns:1fr; }
+      .relay-buttons { flex-direction: column; }
+      .relay-btn { min-width: unset; }
     }
   </style>
 </head>
@@ -223,13 +266,46 @@
     <span id="retry-title-text">⚠️ Connection Lost — Reconnecting...</span>
   </div>
   <div class="retry-detail" id="retry-detail-text">Unable to reach sensor node</div>
-  <div>Retrying in <span id="retry-countdown">3</span>s &nbsp;|&nbsp; Attempt <span id="retry-attempt">1</span> of <span id="retry-max">5</span></div>
+  <div>Retrying in <span id="retry-countdown">10</span>s &nbsp;|&nbsp; Attempt <span id="retry-attempt">1</span> of <span id="retry-max">5</span></div>
   <div class="retry-progress"><div class="retry-progress-bar" id="retry-bar"></div></div>
 </div>
 
 <!-- ALERT BANNER -->
 <div id="alert-banner">⚠️ <span id="alert-text"></span></div>
 
+<!-- ── RELAY TEST PANEL ── -->
+<div class="section-label">🔊 Speaker Test — Highest Threshold Simulation</div>
+<div class="relay-test-card">
+  <div class="relay-test-header">
+    <div class="relay-test-title">Manual Speaker Test — Signal 3 (Highest Level)</div>
+    <div class="relay-test-note">⚠ Testing only — triggers relay for 5 seconds</div>
+  </div>
+  <div class="relay-buttons">
+    <button class="relay-btn btn-temp" onclick="testRelay('temp')" id="btn-temp">
+      🌡 Test Temperature Alert
+    </button>
+    <button class="relay-btn btn-wind" onclick="testRelay('wind')" id="btn-wind">
+      🌬 Test Wind Alert
+    </button>
+    <button class="relay-btn btn-rain" onclick="testRelay('rain')" id="btn-rain">
+      🌧 Test Rain Alert
+    </button>
+    <button class="relay-btn btn-stop" onclick="stopRelay()" id="btn-stop">
+      ⏹ Stop
+    </button>
+  </div>
+  <div class="relay-threshold-info">
+    <span class="threshold-badge temp">🌡 Temp Signal 3: &gt;40°C → Relay 3</span>
+    <span class="threshold-badge wind">🌬 Wind Signal 3: &gt;90 km/h → Relay 3</span>
+    <span class="threshold-badge rain">🌧 Rain Signal 3: &gt;15 mm → Relay 3</span>
+  </div>
+  <div class="relay-status">
+    <span class="relay-status-dot" id="relay-status-dot"></span>
+    <span id="relay-status-text">Idle — no test active</span>
+  </div>
+</div>
+
+<!-- LIVE READINGS -->
 <div class="section-label">📟 Live Readings</div>
 <div class="cards-grid">
   <div class="card" id="card-temp">
@@ -445,17 +521,16 @@ document.getElementById('ucv-logo').onerror = function() {
 
 // ─────────────────────────────────────────────
 //  !! IMPORTANT: Set this to your ESP32's IP !!
-//  Check Serial Monitor after uploading Arduino
-//  code — it shows: http://192.168.x.x/api/sensors
 // ─────────────────────────────────────────────
-const API_URL     = 'http://192.168.1.9/api/sensors';
-const REFRESH_MS  = 3000;   // fetch every 3 seconds
-const MAX_RETRIES = 5;      // max reconnect attempts before giving up
+const API_URL    = 'http://192.168.1.9/api/sensors';
+const RELAY_URL  = 'http://192.168.1.9/relay';
+const REFRESH_MS = 3000;   // fetch every 3 seconds
+const RETRY_COUNTDOWN_SEC = 10;  // ← 10 second retry
+const MAX_RETRIES = 5;
 const THRESH_WIND = 25;
 const THRESH_TEMP = 38;
 const THRESH_RAIN = 0;
 
-// ── State ──────────────────────────────────────
 let retryCount        = 0;
 let countdownInterval = null;
 let currentRange      = 'live';
@@ -465,6 +540,71 @@ let sortAsc           = false;
 let currentPage       = 1;
 const PAGE_SIZE       = 10;
 let searchQuery       = '';
+let relayBusy         = false;
+
+// ── RELAY TEST CONTROL ─────────────────────────
+// Each sensor button triggers Signal 3 (highest threshold)
+// on its dedicated relay:
+//   Temperature → /relay?sensor=temp  → Relay 3 (Signal 3)
+//   Wind        → /relay?sensor=wind  → Relay 3 (Signal 3)
+//   Rain        → /relay?sensor=rain  → Relay 3 (Signal 3)
+
+async function testRelay(sensor) {
+  if (relayBusy) return;
+  relayBusy = true;
+
+  const labels = {
+    temp: '🌡 Temperature Alert (>40°C threshold)',
+    wind: '🌬 Wind Alert (>90 km/h threshold)',
+    rain: '🌧 Rain Alert (>15 mm threshold)'
+  };
+
+  setRelayStatus(true, `Triggering ${labels[sensor]}...`);
+  disableAllButtons(true);
+
+  try {
+    const res = await fetch(`${RELAY_URL}?sensor=${sensor}`, {
+      signal: AbortSignal.timeout(8000)
+    });
+    if (res.ok) {
+      setRelayStatus(true, `✓ ${labels[sensor]} — relay active for 5 seconds`);
+      setTimeout(() => {
+        setRelayStatus(false, 'Idle — no test active');
+        disableAllButtons(false);
+        relayBusy = false;
+      }, 5500);
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch (err) {
+    setRelayStatus(false, `❌ Failed — is ESP32 online? (${err.message})`);
+    disableAllButtons(false);
+    relayBusy = false;
+  }
+}
+
+async function stopRelay() {
+  setRelayStatus(false, 'Stopping relay...');
+  try {
+    await fetch(`${RELAY_URL}?sensor=stop`, { signal: AbortSignal.timeout(4000) });
+    setRelayStatus(false, 'Relay stopped ✓');
+  } catch {
+    setRelayStatus(false, 'Stop sent (relay may already be off)');
+  }
+  disableAllButtons(false);
+  relayBusy = false;
+}
+
+function setRelayStatus(active, text) {
+  document.getElementById('relay-status-dot').className = 'relay-status-dot' + (active ? ' active' : '');
+  document.getElementById('relay-status-text').textContent = text;
+}
+
+function disableAllButtons(disabled) {
+  ['btn-temp', 'btn-wind', 'btn-rain', 'btn-stop'].forEach(id => {
+    document.getElementById(id).disabled = disabled;
+  });
+}
 
 // ── Charts ─────────────────────────────────────
 const chartCfg = (color, fill) => ({
@@ -606,7 +746,6 @@ function updateCards(d) {
   updateWindLadder(wind);
 }
 
-// ── TABLE ──────────────────────────────────────
 function renderTable() {
   let rows = [...allData];
   if (searchQuery) {
@@ -704,7 +843,7 @@ function refreshAll(latest) {
   renderTable();
 }
 
-// ── RETRY / CONNECTION UI ──────────────────────
+// ── RETRY UI ───────────────────────────────────
 function showRetryUI(errorMsg) {
   const banner  = document.getElementById('retry-banner');
   const detail  = document.getElementById('retry-detail-text');
@@ -712,7 +851,6 @@ function showRetryUI(errorMsg) {
   const max     = document.getElementById('retry-max');
   const title   = document.getElementById('retry-title-text');
   const bar     = document.getElementById('retry-bar');
-
   banner.style.display = 'block';
 
   let friendlyMsg = 'Unable to reach sensor node.';
@@ -741,7 +879,8 @@ function showRetryUI(errorMsg) {
   max.textContent     = MAX_RETRIES;
   title.textContent   = '⚠️ Connection Lost — Reconnecting...';
 
-  let secondsLeft = Math.round(REFRESH_MS / 1000);
+  // ← 10 second countdown
+  let secondsLeft = RETRY_COUNTDOWN_SEC;
   document.getElementById('retry-countdown').textContent = secondsLeft;
   bar.style.transition = 'none';
   bar.style.width      = '100%';
@@ -751,7 +890,7 @@ function showRetryUI(errorMsg) {
   countdownInterval = setInterval(() => {
     secondsLeft--;
     document.getElementById('retry-countdown').textContent = Math.max(0, secondsLeft);
-    const pct = (secondsLeft / Math.round(REFRESH_MS / 1000)) * 100;
+    const pct = (secondsLeft / RETRY_COUNTDOWN_SEC) * 100;
     bar.style.width = Math.max(0, pct) + '%';
     if (secondsLeft <= 0) clearInterval(countdownInterval);
   }, 1000);
@@ -762,27 +901,21 @@ function clearRetryUI() {
   if (countdownInterval) clearInterval(countdownInterval);
 }
 
-// ── FETCH LATEST FROM ESP32 ────────────────────
+// ── FETCH FROM ESP32 ───────────────────────────
 async function fetchLatest() {
   try {
     const res  = await fetch(API_URL, { signal: AbortSignal.timeout(4000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (!data || data.temperature === undefined) throw new Error('invalid response');
-
-    // ✅ Success
     retryCount = 0;
     clearRetryUI();
     document.getElementById('conn-dot').className     = 'online';
     document.getElementById('conn-label').textContent = 'Live';
-
-    // Add timestamp if ESP32 doesn't provide one
     data.recorded_at = data.recorded_at || new Date().toISOString().replace('T', ' ').substring(0, 19);
-
     allData.push(data);
     if (allData.length > 500) allData.shift();
     refreshAll(data);
-
   } catch (err) {
     retryCount++;
     document.getElementById('conn-dot').className     = 'offline';
@@ -791,7 +924,6 @@ async function fetchLatest() {
   }
 }
 
-// ── INIT ──────────────────────────────────────
 document.getElementById('conn-dot').className     = 'offline';
 document.getElementById('conn-label').textContent = 'Connecting...';
 fetchLatest();
