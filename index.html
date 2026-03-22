@@ -659,10 +659,10 @@ function clearRetryUI(){document.getElementById('retry-banner').style.display='n
 
 async function fetchLatest() {
   try {
-    const res=await fetch(API_URL,{signal:AbortSignal.timeout(4000)});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    if(!data||data.temperature===undefined) throw new Error('invalid response');
+    const res=await fetch(API_URL+'?rows=1',{signal:AbortSignal.timeout(8000)});
+if(!res.ok) throw new Error('HTTP '+res.status);
+const data=await res.json();
+if(!data||data.temperature===undefined||data.temperature===null) throw new Error('invalid response');
     retryCount=0; clearRetryUI();
     document.getElementById('conn-dot').className='online';
     document.getElementById('conn-label').textContent='Live';
@@ -683,8 +683,6 @@ document.getElementById('conn-dot').className='offline';
 document.getElementById('conn-label').textContent='Connecting...';
 fetchLatest();
 setInterval(fetchLatest, REFRESH_MS);
-setInterval(fetchLog, LOG_REFRESH_MS);
-fetchLog();
 </script>
 </body>
 </html>
