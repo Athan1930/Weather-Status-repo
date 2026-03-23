@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UCV WSN Weather Dashboard</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -39,55 +40,6 @@
     .retry-progress-bar{height:100%;background:var(--red);border-radius:2px;transition:width 1s linear;width:100%;}
     #alert-banner{display:none;background:linear-gradient(135deg,rgba(255,77,109,0.12),rgba(255,77,109,0.06));border:1px solid var(--red);border-radius:10px;padding:14px 20px;margin-bottom:20px;font-size:0.95rem;font-weight:600;color:#ff9999;animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
-
-    /* ── RELAY TEST PANEL ── */
-    .relay-test-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:28px;}
-    .relay-test-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-    .relay-test-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
-    .relay-test-note{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--yellow);background:rgba(245,197,66,0.08);border:1px solid rgba(245,197,66,0.2);border-radius:6px;padding:4px 10px;}
-    .relay-buttons{display:flex;gap:12px;flex-wrap:wrap;}
-    .relay-btn{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;padding:12px 20px;border-radius:10px;border:2px solid;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;flex:1;min-width:160px;justify-content:center;}
-    .relay-btn:disabled{opacity:0.5;cursor:not-allowed;}
-    .relay-btn.btn-temp{background:rgba(255,77,109,0.1);border-color:var(--red);color:var(--red);}
-    .relay-btn.btn-temp:hover:not(:disabled){background:rgba(255,77,109,0.2);box-shadow:0 0 16px rgba(255,77,109,0.3);}
-    .relay-btn.btn-wind{background:rgba(180,142,255,0.1);border-color:var(--purple);color:var(--purple);}
-    .relay-btn.btn-wind:hover:not(:disabled){background:rgba(180,142,255,0.2);box-shadow:0 0 16px rgba(180,142,255,0.3);}
-    .relay-btn.btn-rain{background:rgba(0,212,255,0.1);border-color:var(--accent);color:var(--accent);}
-    .relay-btn.btn-rain:hover:not(:disabled){background:rgba(0,212,255,0.2);box-shadow:0 0 16px rgba(0,212,255,0.3);}
-    .relay-btn.btn-stop{background:rgba(90,122,153,0.1);border-color:var(--muted);color:var(--muted);flex:0;min-width:120px;}
-    .relay-btn.btn-stop:hover:not(:disabled){background:rgba(90,122,153,0.2);border-color:var(--text);color:var(--text);}
-    .relay-status{margin-top:14px;font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
-    .relay-status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:all 0.3s;}
-    .relay-status-dot.active{background:var(--green);box-shadow:0 0 8px var(--green);}
-    .relay-threshold-info{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
-    .threshold-badge{font-family:'Space Mono',monospace;font-size:0.65rem;padding:3px 8px;border-radius:4px;border:1px solid;}
-    .threshold-badge.temp{color:var(--red);border-color:rgba(255,77,109,0.3);background:rgba(255,77,109,0.06);}
-    .threshold-badge.wind{color:var(--purple);border-color:rgba(180,142,255,0.3);background:rgba(180,142,255,0.06);}
-    .threshold-badge.rain{color:var(--accent);border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.06);}
-
-    /* ── WEB TERMINAL ── */
-    .terminal-card{background:#050a0f;border:1px solid var(--border);border-radius:14px;padding:0;margin-bottom:28px;overflow:hidden;}
-    .terminal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0a1018;border-bottom:1px solid var(--border);}
-    .terminal-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);display:flex;align-items:center;gap:8px;}
-    .terminal-dot{width:10px;height:10px;border-radius:50%;}
-    .td-red{background:#ff5f56;}
-    .td-yellow{background:#ffbd2e;}
-    .td-green{background:#27c93f;}
-    .terminal-controls{display:flex;gap:8px;align-items:center;}
-    .terminal-btn{font-family:'Space Mono',monospace;font-size:0.68rem;padding:4px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);cursor:pointer;transition:all 0.15s;}
-    .terminal-btn:hover{border-color:var(--accent2);color:var(--accent);}
-    .terminal-btn.active{border-color:var(--green);color:var(--green);}
-    #terminal-output{font-family:'Space Mono',monospace;font-size:0.72rem;line-height:1.6;padding:16px 18px;height:280px;overflow-y:auto;color:#a8d8a8;background:#050a0f;}
-    #terminal-output .log-sensor{color:#5a7a99;}
-    #terminal-output .log-wifi{color:#00d4ff;}
-    #terminal-output .log-relay{color:#f5c542;}
-    #terminal-output .log-alert{color:#ff4d6d;font-weight:700;}
-    #terminal-output .log-server{color:#b48eff;}
-    #terminal-output .log-gsm{color:#ff8c42;}
-    #terminal-output .log-border{color:#1e2d42;}
-    #terminal-output .log-normal{color:#a8d8a8;}
-    .terminal-status{padding:6px 18px;background:#0a1018;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);display:flex;justify-content:space-between;}
-
     .time-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;align-items:center;}
     .time-tabs label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-right:4px;}
     .tab-btn{font-family:'Space Mono',monospace;font-size:0.78rem;padding:7px 18px;border-radius:6px;border:1px solid var(--border2);background:var(--card);color:var(--muted);cursor:pointer;transition:all 0.2s;}
@@ -159,8 +111,6 @@
     @media(max-width:768px){
       .charts-top-row,.charts-bottom-row{grid-template-columns:1fr;}
       .gauges-grid{grid-template-columns:1fr;}
-      .relay-buttons{flex-direction:column;}
-      .relay-btn{min-width:unset;}
     }
   </style>
 </head>
@@ -195,54 +145,6 @@
 
 <div id="alert-banner">⚠️ <span id="alert-text"></span></div>
 
-<!-- RELAY TEST PANEL -->
-<div class="section-label">🔊 Speaker Test — Highest Threshold Simulation</div>
-<div class="relay-test-card">
-  <div class="relay-test-header">
-    <div class="relay-test-title">Manual Speaker Test — Signal 3 (Highest Level)</div>
-    <div class="relay-test-note">⚠ Testing only — triggers relay for 5 seconds</div>
-  </div>
-  <div class="relay-buttons">
-    <button class="relay-btn btn-temp" onclick="testRelay('temp')" id="btn-temp">🌡 Test Temperature Alert</button>
-    <button class="relay-btn btn-wind" onclick="testRelay('wind')" id="btn-wind">🌬 Test Wind Alert</button>
-    <button class="relay-btn btn-rain" onclick="testRelay('rain')" id="btn-rain">🌧 Test Rain Alert</button>
-    <button class="relay-btn btn-stop" onclick="stopRelay()" id="btn-stop">⏹ Stop</button>
-  </div>
-  <div class="relay-threshold-info">
-    <span class="threshold-badge temp">🌡 Temp &gt;40°C → GPIO 7 (Relay 3)</span>
-    <span class="threshold-badge wind">🌬 Wind &gt;90km/h → GPIO 7 (Relay 3)</span>
-    <span class="threshold-badge rain">🌧 Rain &gt;15mm → GPIO 7 (Relay 3)</span>
-  </div>
-  <div class="relay-status">
-    <span class="relay-status-dot" id="relay-status-dot"></span>
-    <span id="relay-status-text">Idle — no test active</span>
-  </div>
-</div>
-
-<!-- WEB TERMINAL -->
-<div class="section-label">🖥️ Live Terminal — ESP32 Serial Log</div>
-<div class="terminal-card">
-  <div class="terminal-header">
-    <div class="terminal-title">
-      <span class="terminal-dot td-red"></span>
-      <span class="terminal-dot td-yellow"></span>
-      <span class="terminal-dot td-green"></span>
-      &nbsp; NODE-01 Serial Monitor
-    </div>
-    <div class="terminal-controls">
-      <button class="terminal-btn active" id="btn-autoscroll" onclick="toggleAutoscroll()">⬇ Auto-scroll</button>
-      <button class="terminal-btn" onclick="clearTerminal()">🗑 Clear</button>
-      <button class="terminal-btn" id="btn-pause" onclick="togglePause()">⏸ Pause</button>
-    </div>
-  </div>
-  <div id="terminal-output"></div>
-  <div class="terminal-status">
-    <span id="terminal-line-count">0 lines</span>
-    <span id="terminal-refresh-status">Refreshing every 2s</span>
-  </div>
-</div>
-
-<!-- LIVE READINGS -->
 <div class="section-label">📟 Live Readings</div>
 <div class="cards-grid">
   <div class="card" id="card-temp"><div class="card-icon">🌡</div><div class="card-label">Temperature</div><div class="card-value" id="val-temp">--</div><div class="card-unit">°C</div><span class="card-status status-normal" id="status-temp">Normal</span></div>
@@ -383,11 +285,8 @@ document.getElementById('ucv-logo').src = 'https://upload.wikimedia.org/wikipedi
 document.getElementById('ucv-logo').onerror = function() { this.onerror=null; this.src='https://www.ucv.edu.ph/assets/images/ucv-seal.png'; };
 
 // ─── CONFIG ───────────────────────────────────
-const API_URL = 'https://weather-status-repo-production-dd41.up.railway.app/api/data';
-//const LOG_URL    = '';
-const RELAY_URL = 'http://192.168.1.9/relay';
+const API_URL  = 'https://weather-status-repo-production-dd41.up.railway.app/api/data';
 const REFRESH_MS = 3000;
-const LOG_REFRESH_MS = 2000;
 const RETRY_COUNTDOWN_SEC = 10;
 const MAX_RETRIES = 5;
 const THRESH_WIND = 25;
@@ -398,95 +297,6 @@ let retryCount = 0, countdownInterval = null;
 let currentRange = 'live', allData = [], sortKey = 'time', sortAsc = false;
 let currentPage = 1, searchQuery = '';
 const PAGE_SIZE = 10;
-let relayBusy = false;
-let terminalAutoscroll = true;
-let terminalPaused = false;
-let lastLogCount = 0;
-
-// ─── TERMINAL ─────────────────────────────────
-function colorLine(line) {
-  if (line.includes('[SENSOR]'))  return `<span class="log-sensor">${line}</span>`;
-  if (line.includes('[WiFi]'))    return `<span class="log-wifi">${line}</span>`;
-  if (line.includes('[RELAY]'))   return `<span class="log-relay">${line}</span>`;
-  if (line.includes('[ALERT]'))   return `<span class="log-alert">${line}</span>`;
-  if (line.includes('[SERVER]'))  return `<span class="log-server">${line}</span>`;
-  if (line.includes('[GSM]'))     return `<span class="log-gsm">${line}</span>`;
-  if (line.startsWith('│') || line.startsWith('┌') || line.startsWith('└') || line.startsWith('├') || line.startsWith('╔') || line.startsWith('╚') || line.startsWith('║')) {
-    return `<span class="log-border">${line}</span>`;
-  }
-  return `<span class="log-normal">${line}</span>`;
-}
-
-async function fetchLog() {
-  if (terminalPaused) return;
-  try {
-    const res  = await fetch(LOG_URL, { signal: AbortSignal.timeout(3000) });
-    const lines = await res.json();
-    if (!Array.isArray(lines)) return;
-    const out = document.getElementById('terminal-output');
-    const wasAtBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 5;
-    out.innerHTML = lines.map(l => colorLine(l)).join('<br>');
-    document.getElementById('terminal-line-count').textContent = lines.length + ' lines';
-    if (terminalAutoscroll && wasAtBottom) {
-      out.scrollTop = out.scrollHeight;
-    }
-  } catch { /* silently fail if ESP32 offline */ }
-}
-
-function toggleAutoscroll() {
-  terminalAutoscroll = !terminalAutoscroll;
-  const btn = document.getElementById('btn-autoscroll');
-  btn.className = terminalAutoscroll ? 'terminal-btn active' : 'terminal-btn';
-  btn.textContent = terminalAutoscroll ? '⬇ Auto-scroll' : '⬇ Auto-scroll';
-}
-
-function togglePause() {
-  terminalPaused = !terminalPaused;
-  const btn = document.getElementById('btn-pause');
-  btn.textContent = terminalPaused ? '▶ Resume' : '⏸ Pause';
-  btn.className   = terminalPaused ? 'terminal-btn active' : 'terminal-btn';
-  document.getElementById('terminal-refresh-status').textContent = terminalPaused ? 'Paused' : 'Refreshing every 2s';
-}
-
-function clearTerminal() {
-  document.getElementById('terminal-output').innerHTML = '';
-  document.getElementById('terminal-line-count').textContent = '0 lines';
-}
-
-// ─── RELAY CONTROL ─────────────────────────────
-async function testRelay(sensor) {
-  if (relayBusy) return;
-  relayBusy = true;
-  const labels = { temp:'🌡 Temperature Alert (>40°C)', wind:'🌬 Wind Alert (>90km/h)', rain:'🌧 Rain Alert (>15mm)' };
-  setRelayStatus(true, 'Triggering ' + labels[sensor] + '...');
-  disableAllButtons(true);
-  try {
-    const res = await fetch(`${RELAY_URL}?sensor=${sensor}`, { signal: AbortSignal.timeout(8000) });
-    if (res.ok) {
-      setRelayStatus(true, '✓ ' + labels[sensor] + ' — relay active for 5 seconds');
-      setTimeout(() => { setRelayStatus(false,'Idle — no test active'); disableAllButtons(false); relayBusy=false; }, 5500);
-    } else { throw new Error('HTTP ' + res.status); }
-  } catch(err) {
-    setRelayStatus(false, '❌ Failed — is ESP32 online? (' + err.message + ')');
-    disableAllButtons(false); relayBusy=false;
-  }
-}
-
-async function stopRelay() {
-  setRelayStatus(false,'Stopping relay...');
-  try { await fetch(`${RELAY_URL}?sensor=stop`, { signal: AbortSignal.timeout(4000) }); } catch {}
-  setRelayStatus(false,'Relay stopped ✓');
-  disableAllButtons(false); relayBusy=false;
-}
-
-function setRelayStatus(active, text) {
-  document.getElementById('relay-status-dot').className = 'relay-status-dot' + (active?' active':'');
-  document.getElementById('relay-status-text').textContent = text;
-}
-
-function disableAllButtons(d) {
-  ['btn-temp','btn-wind','btn-rain','btn-stop'].forEach(id => document.getElementById(id).disabled = d);
-}
 
 // ─── CHARTS ───────────────────────────────────
 const chartCfg = (color, fill) => ({
@@ -510,7 +320,7 @@ const rainChart = new Chart(document.getElementById('chart-rain'), {
 
 function updateCharts(data) {
   const now=Date.now();
-  const labels=data.map((d,i)=>d.recorded_at?new Date(d.recorded_at+' UTC').toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):new Date(now-(data.length-i)*REFRESH_MS).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  const labels=data.map((d,i)=>d.recorded_at?new Date(d.recorded_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):new Date(now-(data.length-i)*REFRESH_MS).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
   const temps=data.map(d=>parseFloat(d.temperature)), hums=data.map(d=>parseFloat(d.humidity));
   const winds=data.map(d=>parseFloat(d.wind_speed)), rains=data.map(d=>parseFloat(d.rain));
   [[tempChart,temps],[humChart,hums],[windChart,winds]].forEach(([c,d])=>{c.data.labels=labels;c.data.datasets[0].data=d;c.update();});
@@ -592,7 +402,7 @@ function renderTable() {
   const slice=rows.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
   const tbody=document.getElementById('table-body'); tbody.innerHTML='';
   slice.forEach((d,i)=>{
-    const ts=d.recorded_at?new Date(d.recorded_at+' UTC').toLocaleString():new Date().toLocaleTimeString();
+    const ts=d.recorded_at?new Date(d.recorded_at).toLocaleString():new Date().toLocaleTimeString();
     const temp=parseFloat(d.temperature),hum=parseFloat(d.humidity),wind=parseFloat(d.wind_speed),rain=parseFloat(d.rain),totalRain=parseFloat(d.total_rain);
     const isRaining=rain>0, warn=isRaining||temp>THRESH_TEMP||wind>THRESH_WIND;
     const status=isRaining?'RAIN':(temp>THRESH_TEMP?'HIGH TEMP':(wind>THRESH_WIND?'STRONG WIND':'OK'));
@@ -626,13 +436,12 @@ function refreshAll(latest) {
 }
 
 function showRetryUI(errorMsg) {
-  const banner=document.getElementById('retry-banner');
-  banner.style.display='block';
-  let msg='Unable to reach sensor node.';
-  if(errorMsg.includes('fetch')||errorMsg.includes('NetworkError')) msg='Network error — ESP32 may be offline or out of WiFi range.';
-  else if(errorMsg.includes('timeout')||errorMsg.includes('abort')) msg='Connection timed out — ESP32 not responding within 4 seconds.';
+  document.getElementById('retry-banner').style.display='block';
+  let msg='Unable to reach server.';
+  if(errorMsg.includes('fetch')||errorMsg.includes('NetworkError')) msg='Network error — check your internet connection.';
+  else if(errorMsg.includes('timeout')||errorMsg.includes('abort')) msg='Connection timed out — Railway server not responding.';
   else if(errorMsg.includes('HTTP')) msg='Server error: '+errorMsg;
-  else if(errorMsg.includes('invalid')) msg='ESP32 responded but sent no data — check Arduino code.';
+  else if(errorMsg.includes('invalid')) msg='Server responded but sent no data.';
   document.getElementById('retry-detail-text').textContent='⚠ '+msg;
   if(retryCount>=MAX_RETRIES){
     document.getElementById('retry-title-text').textContent='❌ Connection Failed — Max retries reached. Refresh to try again.';
@@ -660,13 +469,12 @@ function clearRetryUI(){document.getElementById('retry-banner').style.display='n
 async function fetchLatest() {
   try {
     const res=await fetch(API_URL+'?rows=1',{signal:AbortSignal.timeout(8000)});
-if(!res.ok) throw new Error('HTTP '+res.status);
-const data=await res.json();
-if(!data||data.temperature===undefined||data.temperature===null) throw new Error('invalid response');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data||data.temperature===undefined||data.temperature===null) throw new Error('invalid response');
     retryCount=0; clearRetryUI();
     document.getElementById('conn-dot').className='online';
     document.getElementById('conn-label').textContent='Live';
-    data.recorded_at=data.recorded_at||new Date().toISOString().replace('T',' ').substring(0,19);
     allData.push(data);
     if(allData.length>500) allData.shift();
     refreshAll(data);
