@@ -87,16 +87,16 @@ app.post('/api/data', (req, res) => {
 });
 
 // ── POST /api/alert — Arduino sends alert ───
-app.post('/api/alert', async (req, res) => {
+app.post('/api/alert', (req, res) => {
   const key = req.headers['x-api-key'];
   if (key !== API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const {
-    node_id    = 'NODE-01',
-    location   = '',
-    signal     = 0,
+    node_id     = 'NODE-01',
+    location    = '',
+    signal      = 0,
     temperature = 0,
     humidity    = 0,
     wind_speed  = 0,
@@ -133,19 +133,20 @@ app.post('/api/alert', async (req, res) => {
     </p>
   `;
 
-  try {
-    await mailer.sendMail({
-      from: `"UCV WSN Node-01" <${process.env.GMAIL_USER}>`,
-      to: process.env.ALERT_EMAIL_TO,
-      subject,
-      html,
-    });
+  // Respond immediately so ESP32 does not timeout waiting for Gmail
+  res.json({ status: 'ok', message: 'Alert received, sending email...' });
+
+  // Send email in background — non-blocking
+  mailer.sendMail({
+    from: `"UCV WSN Node-01" <${process.env.GMAIL_USER}>`,
+    to: process.env.ALERT_EMAIL_TO,
+    subject,
+    html,
+  }).then(() => {
     console.log(`[ALERT] ✓ Email sent — Signal ${signal}`);
-    res.json({ status: 'ok' });
-  } catch (err) {
+  }).catch(err => {
     console.error('[ALERT] !! Email failed:', err.message);
-    res.status(500).json({ error: err.message });
-  }
+  });
 });
 
 // ── GET /api/data — Dashboard fetches data ──
