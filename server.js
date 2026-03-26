@@ -1,7 +1,8 @@
-const express = require('express');
-const { Pool } = require('pg');
-const cors = require('cors');
-const path = require('path');
+const express    = require('express');
+const { Pool }   = require('pg');
+const cors       = require('cors');
+const path       = require('path');
+const nodemailer = require('nodemailer');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -9,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 // ── Middleware ──────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname)); // serves index.html
+app.use(express.static(__dirname));
 
 // ── PostgreSQL connection ───────────────────
 const pool = new Pool({
@@ -36,7 +37,18 @@ async function initDB() {
 }
 
 // ── API KEY ─────────────────────────────────
-const API_KEY = 'ucv-wsn-secret-2025';
+const API_KEY = process.env.API_KEY || 'ucv-wsn-secret-2025';
+
+// ── Nodemailer (Gmail) ───────────────────────
+const mailer = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 // ── POST /api/data — Arduino sends data ─────
 app.post('/api/data', (req, res) => {
@@ -46,8 +58,8 @@ app.post('/api/data', (req, res) => {
   }
 
   const {
-    node_id    = 'NODE-01',
-    location   = '',
+    node_id     = 'NODE-01',
+    location    = '',
     temperature = 0,
     humidity    = 0,
     wind_speed  = 0,
@@ -55,7 +67,6 @@ app.post('/api/data', (req, res) => {
     total_rain  = 0
   } = req.body;
 
-  // Sanity checks
   const temp  = (temperature < -40 || temperature > 85)  ? 0 : parseFloat(temperature);
   const hum   = (humidity    < 0   || humidity    > 100) ? 0 : parseFloat(humidity);
   const wind  = (wind_speed  < 0   || wind_speed  > 400) ? 0 : parseFloat(wind_speed);
@@ -75,17 +86,79 @@ app.post('/api/data', (req, res) => {
   });
 });
 
+// ── POST /api/alert — Arduino sends alert ───
+app.post('/api/alert', async (req, res) => {
+  const key = req.headers['x-api-key'];
+  if (key !== API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const {
+    node_id    = 'NODE-01',
+    location   = '',
+    signal     = 0,
+    temperature = 0,
+    humidity    = 0,
+    wind_speed  = 0,
+    rain        = 0,
+    total_rain  = 0
+  } = req.body;
+
+  const subject = `⚠️ UCV WSN ${node_id} — Signal ${signal} Alert`;
+
+  const html = `
+    <h2 style="color:#cc3300">⚠️ UCV WSN Weather Alert</h2>
+    <table style="border-collapse:collapse;font-family:monospace;font-size:14px">
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Node</td>
+          <td><b>${node_id}</b></td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Location</td>
+          <td>${location}</td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Alert Level</td>
+          <td><b style="color:#cc3300">SIGNAL ${signal}</b></td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Temperature</td>
+          <td>${temperature} °C</td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Humidity</td>
+          <td>${humidity} %</td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Wind Speed</td>
+          <td>${wind_speed} km/h</td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Rain</td>
+          <td>${rain} mm</td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Total Rain</td>
+          <td>${total_rain} mm</td></tr>
+      <tr><td style="padding:4px 16px 4px 0;color:#888">Time (PHT)</td>
+          <td>${new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td></tr>
+    </table>
+    <p style="margin-top:20px;font-size:12px;color:#aaa">
+      UCV CEIT · WSN Research Group · Tuguegarao, Cagayan
+    </p>
+  `;
+
+  try {
+    await mailer.sendMail({
+      from: `"UCV WSN Node-01" <${process.env.GMAIL_USER}>`,
+      to: process.env.ALERT_EMAIL_TO,
+      subject,
+      html,
+    });
+    console.log(`[ALERT] ✓ Email sent — Signal ${signal}`);
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('[ALERT] !! Email failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── GET /api/data — Dashboard fetches data ──
 app.get('/api/data', (req, res) => {
   const rows  = Math.min(1000, Math.max(1, parseInt(req.query.rows) || 60));
   const range = req.query.range || 'live';
 
   const rangeMap = {
-    live:  `NOW() - INTERVAL '2 hours'`,
-    today: `DATE_TRUNC('day', NOW())`,
+    live:    `NOW() - INTERVAL '2 hours'`,
+    today:   `DATE_TRUNC('day', NOW())`,
     '3days': `NOW() - INTERVAL '3 days'`,
-    week:  `NOW() - INTERVAL '7 days'`,
-    month: `NOW() - INTERVAL '30 days'`,
+    week:    `NOW() - INTERVAL '7 days'`,
+    month:   `NOW() - INTERVAL '30 days'`,
   };
   const since = rangeMap[range] || rangeMap.live;
 
@@ -113,8 +186,9 @@ app.get('/', (req, res) => {
 initDB().then(() => {
   app.listen(PORT, () => {
     console.log(`[SERVER] ✓ Running on port ${PORT}`);
-    console.log(`[SERVER] ✓ POST /api/data — Arduino endpoint`);
-    console.log(`[SERVER] ✓ GET  /api/data — Dashboard endpoint`);
+    console.log(`[SERVER] ✓ POST /api/data  — Arduino data endpoint`);
+    console.log(`[SERVER] ✓ POST /api/alert — Arduino alert endpoint`);
+    console.log(`[SERVER] ✓ GET  /api/data  — Dashboard endpoint`);
   });
 }).catch(err => {
   console.error('[DB] !! Failed to connect:', err.message);
