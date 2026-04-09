@@ -19,7 +19,7 @@
     header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 28px,rgba(255,255,255,0.012) 28px,rgba(255,255,255,0.012) 29px);pointer-events:none;}
     header::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#d4a820,#f5c040,#d4a820,transparent);}
     .logo{display:flex;align-items:center;gap:18px;position:relative;z-index:1;}
-    .ucv-seal{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #d4a820;box-shadow:0 0 0 1px rgba(212,168,32,0.3),0 0 20px rgba(212,168,32,0.5),0 0 40px rgba(212,168,32,0.2);flex-shrink:0;}
+    .ucv-seal{width:90px;height:90px;border-radius:50%;object-fit:contain;border:3px solid #d4a820;box-shadow:0 0 0 1px rgba(212,168,32,0.3),0 0 20px rgba(212,168,32,0.5),0 0 40px rgba(212,168,32,0.2);flex-shrink:0;}
     .logo-text{display:flex;flex-direction:column;gap:2px;}
     .logo-text h1{font-size:1.5rem;font-weight:800;letter-spacing:-0.3px;color:#fff;line-height:1.1;}
     .logo-text h1 span{color:#f5c040;}
@@ -281,8 +281,7 @@
 </footer>
 
 <script>
-document.getElementById('ucv-logo').src = 'https://upload.wikimedia.org/wikipedia/en/5/5c/University_of_Cagayan_Valley_official_seal.png';
-document.getElementById('ucv-logo').onerror = function() { this.onerror=null; this.src='https://www.ucv.edu.ph/assets/images/ucv-seal.png'; };
+document.getElementById('ucv-logo').src = 'ucv-logo.png';
 
 // ─── CONFIG ───────────────────────────────────
 const API_URL  = 'https://weather-status-repo-production-dd41.up.railway.app/api/data';
